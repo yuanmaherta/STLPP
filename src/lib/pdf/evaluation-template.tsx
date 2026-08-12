@@ -1,10 +1,11 @@
 // ====================================================================
-// STLPP - EVALUATION PDF REPORT TEMPLATE
-// PDF Document Generator using @react-pdf/renderer
+// STLPP - EVALUATION PDF REPORT TEMPLATE (CORRECTED SIGNATURE POSITIONS)
+// Kiri: Vice President / BOD 1 (Optional)
+// Kanan: Penilai / Atasan Direct
 // ====================================================================
 
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { Employee, EvaluationResult, UserProfile } from '@/types';
 
 const styles = StyleSheet.create({
@@ -92,22 +93,41 @@ const styles = StyleSheet.create({
   signatureName: {
     fontFamily: 'Helvetica-Bold',
   },
+  signatureNote: {
+    fontSize: 8,
+    fontStyle: 'italic',
+    color: '#666',
+    marginTop: 2,
+  },
 });
+
+export interface SignatureData {
+  tempatTanggal?: string;
+  penilaiNama?: string;
+  penilaiJabatan?: string;
+  needBod1?: boolean;
+  bod1Nama?: string;
+  bod1Jabatan?: string;
+}
 
 interface EvaluationPDFProps {
   employee: Employee;
   evaluator: UserProfile;
   evaluation: EvaluationResult;
-  tempatTanggal?: string;
+  signatures?: SignatureData;
 }
 
 export const EvaluationPDFDocument: React.FC<EvaluationPDFProps> = ({
   employee,
   evaluator,
   evaluation,
-  tempatTanggal = 'Jakarta, 8 Agustus 2026',
+  signatures = {},
 }) => {
   const { form_c_data, grand_avg, recommendation, duration } = evaluation;
+
+  const tempatTgl = signatures.tempatTanggal || 'Jakarta, 8 Agustus 2026';
+  const penilaiNama = signatures.penilaiNama || evaluator.name;
+  const penilaiJabatan = signatures.penilaiJabatan || evaluator.division || 'Atasan Direct';
 
   return (
     <Document>
@@ -179,26 +199,38 @@ export const EvaluationPDFDocument: React.FC<EvaluationPDFProps> = ({
           <Text>{form_c_data.saranPengembangan || '-'}</Text>
         </View>
 
-        {/* Signatures */}
+        {/* Corrected Signatures Layout */}
         <View style={{ marginTop: 15 }}>
-          <Text>{tempatTanggal}</Text>
+          <Text>{tempatTgl}</Text>
           <View style={styles.signatureSection}>
+            {/* KIRI: Atasan / BOD 1 (Optional) */}
+            <View style={styles.signatureBox}>
+              <Text>Mengetahui / Menyetujui,</Text>
+              <View style={styles.signatureSpace} />
+              {signatures.needBod1 ? (
+                <View style={styles.signatureLine}>
+                  <Text style={styles.signatureName}>
+                    {signatures.bod1Nama || '( ..................................... )'}
+                  </Text>
+                  <Text>{signatures.bod1Jabatan || 'Executive Vice President'}</Text>
+                </View>
+              ) : (
+                <View style={styles.signatureLine}>
+                  <Text style={{ color: '#888' }}>(Tidak diperlukan untuk evaluasi ini)</Text>
+                </View>
+              )}
+              <Text style={styles.signatureNote}>(Atasan / BOD 1 / VP HC)</Text>
+            </View>
+
+            {/* KANAN: Penilai / Atasan Direct */}
             <View style={styles.signatureBox}>
               <Text>{employee.divisi}</Text>
               <View style={styles.signatureSpace} />
               <View style={styles.signatureLine}>
-                <Text style={styles.signatureName}>{evaluator.name}</Text>
-                <Text>Penilai / Atasan Direct</Text>
+                <Text style={styles.signatureName}>{penilaiNama}</Text>
+                <Text>{penilaiJabatan}</Text>
               </View>
-            </View>
-
-            <View style={styles.signatureBox}>
-              <Text>Human Capital Management</Text>
-              <View style={styles.signatureSpace} />
-              <View style={styles.signatureLine}>
-                <Text style={styles.signatureName}>( ..................................... )</Text>
-                <Text>Atasan / Vice President HC</Text>
-              </View>
+              <Text style={styles.signatureNote}>(Tanda Tangan Penilai Direct)</Text>
             </View>
           </View>
         </View>
