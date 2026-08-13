@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -11,7 +12,9 @@ import {
   UserCog,
   ClipboardCheck,
   History,
+  LogOut,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 // Data navigasi didefinisikan di sini (dalam Client Component), bukan dikirim
 // lewat props dari layout.tsx (Server Component) — karena referensi komponen
@@ -41,12 +44,37 @@ const NAV_CONFIG = {
 
 interface SidebarProps {
   variant: keyof typeof NAV_CONFIG;
-  userName?: string;
 }
 
-export function Sidebar({ variant, userName }: SidebarProps) {
+export function Sidebar({ variant }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { portalLabel, userRoleLabel, items } = NAV_CONFIG[variant];
+
+  const [userName, setUserName] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        supabase
+          .from('users')
+          .select('name')
+          .eq('id', data.user.id)
+          .single()
+          .then(({ data: profile }) => setUserName(profile?.name ?? data.user!.email ?? null));
+      }
+    });
+  }, []);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <aside className="w-64 shrink-0 bg-slate-900 text-slate-200 min-h-screen flex flex-col">
@@ -77,8 +105,16 @@ export function Sidebar({ variant, userName }: SidebarProps) {
       </nav>
 
       <div className="px-5 py-4 border-t border-slate-800">
-        <p className="text-sm font-semibold text-white truncate">{userName ?? '(belum login)'}</p>
-        <p className="text-xs text-slate-500">{userRoleLabel}</p>
+        <p className="text-sm font-semibold text-white truncate">{userName ?? 'Memuat...'}</p>
+        <p className="text-xs text-slate-500 mb-3">{userRoleLabel}</p>
+        <button
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="flex items-center gap-2 text-xs text-slate-400 hover:text-white transition-colors disabled:opacity-50"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          {loggingOut ? 'Keluar...' : 'Keluar'}
+        </button>
       </div>
     </aside>
   );
