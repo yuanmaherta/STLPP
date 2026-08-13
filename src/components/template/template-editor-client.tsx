@@ -54,6 +54,66 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
     });
   };
 
+  const editGroupTitle = (bucket: keyof FormTemplateStructure, groupIdx: number, title: string) => {
+    setStructure((prev) => {
+      const groups = [...prev[bucket]];
+      groups[groupIdx] = { ...groups[groupIdx], group: title };
+      return { ...prev, [bucket]: groups };
+    });
+  };
+
+  const editSubgroupLabel = (bucket: keyof FormTemplateStructure, groupIdx: number, subIdx: number, label: string) => {
+    setStructure((prev) => {
+      const groups = [...prev[bucket]];
+      const g = { ...groups[groupIdx] };
+      if (!g.subgroups) return prev;
+      const subgroups = [...g.subgroups];
+      subgroups[subIdx] = { ...subgroups[subIdx], label };
+      g.subgroups = subgroups;
+      groups[groupIdx] = g;
+      return { ...prev, [bucket]: groups };
+    });
+  };
+
+  const addGroup = (bucket: keyof FormTemplateStructure) => {
+    const name = prompt('Nama kategori baru (cth: Kedisiplinan Kerja):');
+    if (!name || !name.trim()) return;
+    setStructure((prev) => {
+      const groups = prev[bucket];
+      const nextNo = groups.reduce((max, g) => Math.max(max, g.no ?? 0), 0) + 1;
+      const newGroup: FormGroup = { group: name.trim(), no: nextNo, items: [] };
+      return { ...prev, [bucket]: [...groups, newGroup] };
+    });
+  };
+
+  const deleteGroup = (bucket: keyof FormTemplateStructure, groupIdx: number) => {
+    if (!confirm('Hapus seluruh kategori ini beserta semua unsur di dalamnya? Evaluasi lama tidak terpengaruh (tersimpan sebagai snapshot versi lama).')) return;
+    setStructure((prev) => ({ ...prev, [bucket]: prev[bucket].filter((_, i) => i !== groupIdx) }));
+  };
+
+  const addSubgroup = (bucket: keyof FormTemplateStructure, groupIdx: number) => {
+    const name = prompt('Nama sub-kategori baru:');
+    if (!name || !name.trim()) return;
+    setStructure((prev) => {
+      const groups = [...prev[bucket]];
+      const g = { ...groups[groupIdx] };
+      g.subgroups = [...(g.subgroups ?? []), { label: name.trim(), items: [] }];
+      groups[groupIdx] = g;
+      return { ...prev, [bucket]: groups };
+    });
+  };
+
+  const deleteSubgroup = (bucket: keyof FormTemplateStructure, groupIdx: number, subIdx: number) => {
+    if (!confirm('Hapus sub-kategori ini beserta unsur di dalamnya?')) return;
+    setStructure((prev) => {
+      const groups = [...prev[bucket]];
+      const g = { ...groups[groupIdx] };
+      g.subgroups = (g.subgroups ?? []).filter((_, i) => i !== subIdx);
+      groups[groupIdx] = g;
+      return { ...prev, [bucket]: groups };
+    });
+  };
+
   const editLabel = (bucket: keyof FormTemplateStructure, groupIdx: number, itemId: string, label: string, subIdx?: number) => {
     updateItems(bucket, groupIdx, (items) => items.map((it) => (it.id === itemId ? { ...it, label } : it)), subIdx);
   };
@@ -188,12 +248,29 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
 
       {(Object.keys(BUCKET_LABELS) as Array<keyof FormTemplateStructure>).map((bucket) => (
         <div key={bucket} className="mb-6">
-          <h2 className="font-bold text-blue-900 text-sm mb-3">{BUCKET_LABELS[bucket]}</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-bold text-blue-900 text-sm">{BUCKET_LABELS[bucket]}</h2>
+            <button onClick={() => addGroup(bucket)} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800">
+              <Plus className="w-3.5 h-3.5" /> Tambah Kategori
+            </button>
+          </div>
           {structure[bucket].map((group: FormGroup, groupIdx: number) => (
-            <div key={group.group} className="bg-white rounded-lg border border-slate-200 mb-3 overflow-hidden">
-              <div className="bg-slate-50 px-4 py-2 font-semibold text-sm text-slate-700">
-                {group.no ? `${group.no}. ` : ''}
-                {group.group}
+            <div key={`${group.group}-${groupIdx}`} className="bg-white rounded-lg border border-slate-200 mb-3 overflow-hidden">
+              <div className="bg-slate-50 px-4 py-2 flex items-center gap-2">
+                <span className="text-xs text-slate-400 w-6 shrink-0">{group.no ?? ''}</span>
+                <input
+                  value={group.group}
+                  onChange={(e) => editGroupTitle(bucket, groupIdx, e.target.value)}
+                  className="flex-1 bg-transparent font-semibold text-sm text-slate-700 border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1 py-0.5"
+                />
+                {group.subgroups && (
+                  <button onClick={() => addSubgroup(bucket, groupIdx)} title="Tambah sub-kategori" className="text-blue-600 hover:text-blue-800 shrink-0">
+                    <Plus className="w-4 h-4" />
+                  </button>
+                )}
+                <button onClick={() => deleteGroup(bucket, groupIdx)} title="Hapus kategori" className="text-rose-400 hover:text-rose-600 shrink-0">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
               <div className="px-4 py-2">
                 {group.items && (
@@ -209,8 +286,17 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                 )}
                 {group.subgroups &&
                   group.subgroups.map((sg, subIdx) => (
-                    <div key={sg.label} className="mt-2">
-                      <div className="text-xs font-bold uppercase tracking-wide text-slate-400 mt-2 mb-1">{sg.label}</div>
+                    <div key={`${sg.label}-${subIdx}`} className="mt-2">
+                      <div className="flex items-center gap-2 mt-2 mb-1">
+                        <input
+                          value={sg.label}
+                          onChange={(e) => editSubgroupLabel(bucket, groupIdx, subIdx, e.target.value)}
+                          className="flex-1 bg-transparent text-xs font-bold uppercase tracking-wide text-slate-400 border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1"
+                        />
+                        <button onClick={() => deleteSubgroup(bucket, groupIdx, subIdx)} title="Hapus sub-kategori" className="text-rose-400 hover:text-rose-600 shrink-0">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                       {sg.items.map((item) => renderItem(bucket, groupIdx, item, subIdx))}
                       <button
                         onClick={() => addItem(bucket, groupIdx, subIdx)}
@@ -220,6 +306,9 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                       </button>
                     </div>
                   ))}
+                {!group.items && !group.subgroups && (
+                  <p className="text-xs text-slate-400 py-2">Kategori kosong.</p>
+                )}
               </div>
             </div>
           ))}

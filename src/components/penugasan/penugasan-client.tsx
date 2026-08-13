@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Plus, Trash2, X, Loader2, AlertCircle, Search } from 'lucide-react';
+import { Plus, Trash2, X, Loader2, AlertCircle, Search, CheckSquare, Square } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface EmployeeOption {
@@ -35,8 +35,6 @@ interface PenugasanClientProps {
   loadError: string | null;
 }
 
-const EMPTY_FORM = { employee_id: '', evaluator_id: '', period: '', deadline: '' };
-
 const STATUS_STYLE: Record<AssignmentRow['status'], string> = {
   PENDING: 'bg-amber-100 text-amber-800',
   COMPLETED: 'bg-emerald-100 text-emerald-800',
@@ -53,10 +51,16 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
   const [assignments, setAssignments] = useState<AssignmentRow[]>(initialAssignments);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [formError, setFormError] = useState('');
+
+  // form modal state
+  const [empSearch, setEmpSearch] = useState('');
+  const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<Set<string>>(new Set());
+  const [evaluatorId, setEvaluatorId] = useState('');
+  const [period, setPeriod] = useState('');
+  const [deadline, setDeadline] = useState('');
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -70,40 +74,75 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
     );
   }, [assignments, search]);
 
+  const filteredEmployees = useMemo(() => {
+    const q = empSearch.trim().toLowerCase();
+    if (!q) return employees;
+    return employees.filter((e) => e.nama.toLowerCase().includes(q) || e.nik.toLowerCase().includes(q) || e.divisi.toLowerCase().includes(q));
+  }, [employees, empSearch]);
+
+  const allFilteredEmpSelected = filteredEmployees.length > 0 && filteredEmployees.every((e) => selectedEmployeeIds.has(e.id));
+
+  const toggleAllEmp = () => {
+    setSelectedEmployeeIds((prev) => {
+      const next = new Set(prev);
+      if (allFilteredEmpSelected) filteredEmployees.forEach((e) => next.delete(e.id));
+      else filteredEmployees.forEach((e) => next.add(e.id));
+      return next;
+    });
+  };
+
+  const toggleEmp = (id: string) => {
+    setSelectedEmployeeIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
   const openAdd = () => {
-    setForm(EMPTY_FORM);
+    setEmpSearch('');
+    setSelectedEmployeeIds(new Set());
+    setEvaluatorId('');
+    setPeriod('');
+    setDeadline('');
     setFormError('');
     setModalOpen(true);
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedEmployeeIds.size === 0) {
+      setFormError('Pilih minimal 1 karyawan.');
+      return;
+    }
     setSaving(true);
     setFormError('');
 
     try {
       const supabase = createClient();
+      const rowsToInsert = Array.from(selectedEmployeeIds).map((employee_id) => ({
+        employee_id,
+        evaluator_id: evaluatorId,
+        period: period.trim(),
+        deadline,
+      }));
+
       const { data, error } = await supabase
         .from('assignments')
-        .insert({
-          employee_id: form.employee_id,
-          evaluator_id: form.evaluator_id,
-          period: form.period.trim(),
-          deadline: form.deadline,
-        })
+        .insert(rowsToInsert)
         .select(
           'id, period, deadline, status, assigned_at, employee:employees(id, nama, nik, jabatan, divisi), evaluator:users(id, name, email)'
-        )
-        .single();
+        );
 
       if (error) {
         if (error.message.includes('duplicate') || error.message.includes('uq_assignment_employee_period')) {
-          throw new Error('Karyawan ini sudah punya penugasan untuk periode yang sama.');
+          throw new Error('Salah satu karyawan yang dipilih sudah punya penugasan untuk periode yang sama. Batalkan dulu penugasan lamanya, atau hapus dari pilihan.');
         }
         throw new Error(error.message);
       }
 
-      setAssignments((prev) => [data as any, ...prev]);
+      setAssignments((prev) => [...((data as any) ?? []), ...prev]);
       setModalOpen(false);
     } catch (err: any) {
       setFormError(err.message ?? 'Gagal menyimpan penugasan.');
@@ -216,7 +255,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
 
       {modalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
               <h2 className="font-bold text-slate-800">Tugaskan Penilaian</h2>
               <button onClick={() => !saving && setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
@@ -224,34 +263,60 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-6 space-y-4">
+            <form onSubmit={handleSave} className="flex-1 overflow-y-auto p-6 space-y-4">
               {formError && (
                 <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{formError}</div>
               )}
 
-              <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Karyawan *</span>
-                <select
-                  required
-                  value={form.employee_id}
-                  onChange={(e) => setForm((f) => ({ ...f, employee_id: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">- Pilih karyawan -</option>
-                  {employees.map((e) => (
-                    <option key={e.id} value={e.id}>
-                      {e.nama} ({e.nik}) — {e.jabatan}
-                    </option>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="block text-sm text-slate-600">Karyawan * (bisa pilih beberapa sekaligus)</span>
+                  <span className="text-xs text-slate-400">{selectedEmployeeIds.size} dipilih</span>
+                </div>
+                <div className="relative mb-2">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    value={empSearch}
+                    onChange={(e) => setEmpSearch(e.target.value)}
+                    placeholder="Cari nama / NIK / divisi..."
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div className="border border-slate-200 rounded-lg max-h-64 overflow-y-auto">
+                  <button
+                    type="button"
+                    onClick={toggleAllEmp}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 sticky top-0"
+                  >
+                    {allFilteredEmpSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                    Pilih semua ({filteredEmployees.length})
+                  </button>
+                  {filteredEmployees.map((emp) => (
+                    <label
+                      key={emp.id}
+                      className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0"
+                    >
+                      <input type="checkbox" checked={selectedEmployeeIds.has(emp.id)} onChange={() => toggleEmp(emp.id)} className="w-4 h-4 shrink-0" />
+                      <span className="flex-1">
+                        <span className="font-medium text-slate-800">{emp.nama}</span>{' '}
+                        <span className="text-slate-400 text-xs">({emp.nik})</span>
+                        <br />
+                        <span className="text-xs text-slate-400">
+                          {emp.jabatan} — {emp.divisi}
+                        </span>
+                      </span>
+                    </label>
                   ))}
-                </select>
-              </label>
+                  {filteredEmployees.length === 0 && <div className="px-3 py-6 text-center text-xs text-slate-400">Tidak ada hasil.</div>}
+                </div>
+              </div>
 
               <label className="block text-sm">
                 <span className="block text-slate-600 mb-1">Atasan Penilai *</span>
                 <select
                   required
-                  value={form.evaluator_id}
-                  onChange={(e) => setForm((f) => ({ ...f, evaluator_id: e.target.value }))}
+                  value={evaluatorId}
+                  onChange={(e) => setEvaluatorId(e.target.value)}
                   className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">- Pilih atasan -</option>
@@ -269,8 +334,8 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                   <input
                     required
                     placeholder="cth: Agustus 2026"
-                    value={form.period}
-                    onChange={(e) => setForm((f) => ({ ...f, period: e.target.value }))}
+                    value={period}
+                    onChange={(e) => setPeriod(e.target.value)}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </label>
@@ -279,8 +344,8 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                   <input
                     required
                     type="date"
-                    value={form.deadline}
-                    onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </label>
@@ -300,7 +365,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                   className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                  Simpan
+                  Tugaskan {selectedEmployeeIds.size > 0 ? `(${selectedEmployeeIds.size} karyawan)` : ''}
                 </button>
               </div>
             </form>

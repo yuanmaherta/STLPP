@@ -1,24 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Search, Plus, Pencil, Trash2, X, Loader2, AlertCircle, UserRound } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, X, Loader2, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { DIVISI_LIST, ANAK_PERUSAHAAN_LIST } from '@/lib/data/organisasi';
+import { STATUS_KONTRAK_LIST } from '@/lib/data/kontrak';
 import type { Employee } from '@/types';
-
-function isKnownDivisi(value: string): boolean {
-  return DIVISI_LIST.includes(value) || ANAK_PERUSAHAAN_LIST.includes(value);
-}
-
-interface AtasanOption {
-  id: string;
-  name: string;
-  email: string;
-}
 
 interface KaryawanClientProps {
   initialEmployees: Employee[];
-  atasanList: AtasanOption[];
   loadError: string | null;
 }
 
@@ -33,7 +23,6 @@ type FormState = {
   masa_kerja: string;
   status_kontrak: string;
   tgl_habis_kontrak: string;
-  atasan_id: string;
 };
 
 const EMPTY_FORM: FormState = {
@@ -44,12 +33,11 @@ const EMPTY_FORM: FormState = {
   divisi: '',
   bagian: '',
   masa_kerja: '',
-  status_kontrak: 'Kontrak 1',
+  status_kontrak: STATUS_KONTRAK_LIST[0],
   tgl_habis_kontrak: '',
-  atasan_id: '',
 };
 
-export function KaryawanClient({ initialEmployees, atasanList, loadError }: KaryawanClientProps) {
+export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientProps) {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -70,8 +58,6 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
     );
   }, [employees, search]);
 
-  const atasanName = (id?: string) => atasanList.find((a) => a.id === id)?.name ?? '-';
-
   const openAdd = () => {
     setForm(EMPTY_FORM);
     setFormError('');
@@ -88,9 +74,8 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
       divisi: emp.divisi,
       bagian: emp.bagian ?? '',
       masa_kerja: emp.masa_kerja ?? '',
-      status_kontrak: emp.status_kontrak,
+      status_kontrak: emp.status_kontrak || STATUS_KONTRAK_LIST[0],
       tgl_habis_kontrak: emp.tgl_habis_kontrak,
-      atasan_id: emp.atasan_id ?? '',
     });
     setFormError('');
     setModalOpen(true);
@@ -112,12 +97,11 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
       nama: form.nama.trim(),
       tgl_lahir: form.tgl_lahir || null,
       jabatan: form.jabatan.trim(),
-      divisi: form.divisi.trim(),
+      divisi: form.divisi,
       bagian: form.bagian.trim() || null,
       masa_kerja: form.masa_kerja.trim() || null,
-      status_kontrak: form.status_kontrak.trim(),
+      status_kontrak: form.status_kontrak,
       tgl_habis_kontrak: form.tgl_habis_kontrak,
-      atasan_id: form.atasan_id || null,
     };
 
     if (form.id) {
@@ -196,7 +180,6 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                 <th className="p-4">Nama</th>
                 <th className="p-4">Jabatan / Divisi</th>
                 <th className="p-4">Status Kontrak</th>
-                <th className="p-4">Atasan</th>
                 <th className="p-4">Akhir Kontrak</th>
                 <th className="p-4 text-right">Aksi</th>
               </tr>
@@ -210,10 +193,10 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                     <p className="text-slate-800">{emp.jabatan}</p>
                     <p className="text-xs text-slate-400">{emp.divisi}</p>
                   </td>
-                  <td className="p-4 text-slate-600">{emp.status_kontrak}</td>
-                  <td className="p-4 text-slate-600 flex items-center gap-1.5">
-                    <UserRound className="w-3.5 h-3.5 text-slate-400" />
-                    {atasanName(emp.atasan_id)}
+                  <td className="p-4">
+                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                      {emp.status_kontrak}
+                    </span>
                   </td>
                   <td className="p-4 text-slate-600">{emp.tgl_habis_kontrak}</td>
                   <td className="p-4">
@@ -239,7 +222,7 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-slate-400">
+                  <td colSpan={6} className="p-8 text-center text-slate-400">
                     {employees.length === 0 ? 'Belum ada data karyawan.' : 'Tidak ada hasil yang cocok.'}
                   </td>
                 </tr>
@@ -311,11 +294,11 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                   <span className="block text-slate-600 mb-1">Divisi / Unit Kerja *</span>
                   <select
                     required
-                    value={isKnownDivisi(form.divisi) ? form.divisi : 'LAINNYA'}
-                    onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value === 'LAINNYA' ? '' : e.target.value }))}
+                    value={form.divisi}
+                    onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="LAINNYA">- Pilih atau ketik manual di bawah -</option>
+                    <option value="">- Pilih -</option>
                     <optgroup label="Divisi (Kantor Pusat)">
                       {DIVISI_LIST.map((d) => (
                         <option key={d} value={d}>
@@ -331,15 +314,6 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                       ))}
                     </optgroup>
                   </select>
-                  {!isKnownDivisi(form.divisi) && (
-                    <input
-                      required
-                      value={form.divisi}
-                      onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
-                      placeholder="Ketik nama divisi/unit kerja"
-                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  )}
                 </label>
               </div>
 
@@ -364,49 +338,34 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                 </label>
                 <label className="text-sm">
                   <span className="block text-slate-600 mb-1">Status Kontrak *</span>
-                  <input
+                  <select
                     required
-                    placeholder="cth: Kontrak 1"
                     value={form.status_kontrak}
                     onChange={(e) => setForm((f) => ({ ...f, status_kontrak: e.target.value }))}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Akhir Kontrak *</span>
-                  <input
-                    required
-                    type="date"
-                    value={form.tgl_habis_kontrak}
-                    onChange={(e) => setForm((f) => ({ ...f, tgl_habis_kontrak: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </label>
-                <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Atasan Penilai</span>
-                  <select
-                    value={form.atasan_id}
-                    onChange={(e) => setForm((f) => ({ ...f, atasan_id: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="">- Belum ditentukan -</option>
-                    {atasanList.map((a) => (
-                      <option key={a.id} value={a.id}>
-                        {a.name}
+                    {STATUS_KONTRAK_LIST.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
                       </option>
                     ))}
                   </select>
                 </label>
               </div>
 
-              {atasanList.length === 0 && (
-                <p className="text-xs text-amber-600">
-                  Belum ada akun atasan terdaftar. Buat dulu di menu Manajemen Pengguna supaya bisa dipilih di sini.
-                </p>
-              )}
+              <label className="block text-sm">
+                <span className="block text-slate-600 mb-1">Akhir Kontrak *</span>
+                <input
+                  required
+                  type="date"
+                  value={form.tgl_habis_kontrak}
+                  onChange={(e) => setForm((f) => ({ ...f, tgl_habis_kontrak: e.target.value }))}
+                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </label>
+              <p className="text-xs text-slate-400 -mt-2">
+                Atasan penilai diatur dari menu <b>Penugasan</b>, bukan di sini.
+              </p>
 
               <div className="flex justify-end gap-2 pt-2">
                 <button
