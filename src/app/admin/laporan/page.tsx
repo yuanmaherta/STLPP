@@ -1,15 +1,22 @@
-import { BarChart3 } from 'lucide-react';
-import { ComingSoon } from '@/components/layout/coming-soon';
+import { createClient } from '@/lib/supabase/server';
+import { LaporanClient } from '@/components/laporan/laporan-client';
 
-export default function LaporanPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function LaporanPage() {
+  const supabase = createClient();
+
+  const { data: rows, error } = await supabase
+    .from('evaluations')
+    .select(
+      'id, grand_avg, recommendation, duration, form_c_data, submitted_at, assignment:assignments(id, period, employee:employees(id, nik, nama, jabatan, divisi, bagian, masa_kerja), evaluator:users(name))'
+    )
+    .order('submitted_at', { ascending: false });
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Laporan</h1>
-      <ComingSoon
-        title="Dashboard Analitik & Report"
-        description="Chart distribusi kontrak, kata kunci TNA, progress bulanan, serta filter + export Excel/PDF akan tampil di sini."
-        icon={BarChart3}
-      />
+      <LaporanClient initialRows={(rows as any) ?? []} loadError={error?.message ?? null} />
     </div>
   );
 }
