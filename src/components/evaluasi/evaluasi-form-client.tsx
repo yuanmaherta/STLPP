@@ -198,12 +198,13 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
                 <td className="border border-black p-1"></td>
                 <td className="border border-black p-1 text-left">{it.no}. {it.label}</td>
                 {SCALE_VALUES.map((v) => (
-                  <td key={v} className="border border-black p-1 text-center align-middle">
-                    {scores[it.id] === v ? (
-                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-black font-bold">{v}</span>
-                    ) : (
-                      v
-                    )}
+                  <td
+                    key={v}
+                    className={`border border-black p-1 text-center align-middle ${
+                      scores[it.id] === v ? 'bg-gray-600 text-white font-bold' : ''
+                    }`}
+                  >
+                    {v}
                   </td>
                 ))}
               </tr>
@@ -215,18 +216,83 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
   );
 }
 
-function RadioTriple({ label, value, onChange, readOnly }: { label: string; value: string; onChange: (v: string) => void; readOnly: boolean }) {
+const PENGEMBANGAN_CAPTIONS: Record<'Baik' | 'Sedang' | 'Kurang', string> = {
+  Baik: 'Karyawan sangat direkomendasikan untuk dilakukan pengembangan',
+  Sedang: 'Karyawan masih dapat dilakukan pengembangan',
+  Kurang: 'Karyawan kurang/sulit untuk dapat dikembangkan pada Unit Kerja',
+};
+
+function ChecklistCategory({
+  label,
+  value,
+  onChange,
+  readOnly,
+  catatan,
+  onCatatanChange,
+  fixedCaptions,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  readOnly: boolean;
+  catatan?: string;
+  onCatatanChange?: (v: string) => void;
+  fixedCaptions?: Record<'Baik' | 'Sedang' | 'Kurang', string>;
+}) {
   return (
     <div className="border border-gray-200 rounded-lg p-4">
       <div className="font-semibold text-sm text-gray-800 mb-2">{label}</div>
-      <div className="flex gap-4">
-        {['Baik', 'Sedang', 'Kurang'].map((opt) => (
-          <label key={opt} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
-            <input type="radio" disabled={readOnly} checked={value === opt} onChange={() => onChange(opt)} className="w-4 h-4" />
-            {opt}
+      <div className="space-y-2">
+        {(['Baik', 'Sedang', 'Kurang'] as const).map((opt) => (
+          <label key={opt} className="flex items-start gap-2 text-sm text-gray-700 cursor-pointer">
+            <input type="radio" disabled={readOnly} checked={value === opt} onChange={() => onChange(opt)} className="w-4 h-4 mt-0.5 shrink-0" />
+            <span className="w-16 shrink-0">{opt}</span>
+            <span className="text-gray-400">:</span>
+            {fixedCaptions ? (
+              <span className="text-xs text-gray-500">{fixedCaptions[opt]}</span>
+            ) : (
+              value === opt &&
+              onCatatanChange && (
+                <input
+                  disabled={readOnly}
+                  value={catatan ?? ''}
+                  onChange={(e) => onCatatanChange(e.target.value)}
+                  placeholder="Catatan (opsional)"
+                  className="flex-1 border-b border-gray-300 text-xs px-1 py-0.5 focus:outline-none focus:border-blue-500 disabled:bg-transparent"
+                />
+              )
+            )}
           </label>
         ))}
       </div>
+    </div>
+  );
+}
+
+function PrintChecklistCategory({
+  label,
+  value,
+  catatan,
+  fixedCaptions,
+}: {
+  label: string;
+  value: string;
+  catatan?: string;
+  fixedCaptions?: Record<'Baik' | 'Sedang' | 'Kurang', string>;
+}) {
+  return (
+    <div className="flex-1 border border-black p-2">
+      <div className="font-bold mb-1">{label}</div>
+      {(['Baik', 'Sedang', 'Kurang'] as const).map((opt) => (
+        <div key={opt} className="flex items-start gap-1 mb-0.5">
+          <span className="inline-flex items-center justify-center w-3 h-3 border border-black text-[8px] font-bold shrink-0 mt-0.5">
+            {value === opt ? 'V' : ''}
+          </span>
+          <span className="w-12 shrink-0">{opt}</span>
+          <span>:</span>
+          <span className="text-gray-600">{fixedCaptions ? fixedCaptions[opt] : value === opt ? catatan || '' : ''}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -484,21 +550,34 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
         <h2 className="font-bold text-blue-900 mb-1">FORM C</h2>
         <h3 className="font-semibold text-blue-800 mb-3 text-sm underline">Pengembangan, Potensi, dan Kinerja</h3>
         <div className="grid sm:grid-cols-3 gap-3 mb-4 print:hidden">
-          <RadioTriple label="Kinerja Karyawan" value={formC.kinerja} onChange={(v) => setFormC((f) => ({ ...f, kinerja: v as any }))} readOnly={readOnly} />
-          <RadioTriple label="Potensi Karyawan" value={formC.potensi} onChange={(v) => setFormC((f) => ({ ...f, potensi: v as any }))} readOnly={readOnly} />
-          <RadioTriple label="Pengembangan Karyawan" value={formC.pengembangan} onChange={(v) => setFormC((f) => ({ ...f, pengembangan: v as any }))} readOnly={readOnly} />
+          <ChecklistCategory
+            label="Kinerja Karyawan"
+            value={formC.kinerja}
+            onChange={(v) => setFormC((f) => ({ ...f, kinerja: v as any }))}
+            readOnly={readOnly}
+            catatan={formC.kinerjaCatatan}
+            onCatatanChange={(v) => setFormC((f) => ({ ...f, kinerjaCatatan: v }))}
+          />
+          <ChecklistCategory
+            label="Potensi Karyawan"
+            value={formC.potensi}
+            onChange={(v) => setFormC((f) => ({ ...f, potensi: v as any }))}
+            readOnly={readOnly}
+            catatan={formC.potensiCatatan}
+            onCatatanChange={(v) => setFormC((f) => ({ ...f, potensiCatatan: v }))}
+          />
+          <ChecklistCategory
+            label="Pengembangan Karyawan"
+            value={formC.pengembangan}
+            onChange={(v) => setFormC((f) => ({ ...f, pengembangan: v as any }))}
+            readOnly={readOnly}
+            fixedCaptions={PENGEMBANGAN_CAPTIONS}
+          />
         </div>
         <div className="hidden print:flex gap-2 mb-4 text-xs">
-          {[['Kinerja Karyawan', formC.kinerja], ['Potensi Karyawan', formC.potensi], ['Pengembangan Karyawan', formC.pengembangan]].map(([label, val]) => (
-            <div key={label} className="flex-1 border border-black p-2">
-              <div className="font-bold mb-1">{label}</div>
-              {['Baik', 'Sedang', 'Kurang'].map((opt) => (
-                <div key={opt}>
-                  <span className="inline-flex items-center justify-center w-3 h-3 border border-black text-[8px] font-bold mr-1">{val === opt ? 'V' : ''}</span> {opt}
-                </div>
-              ))}
-            </div>
-          ))}
+          <PrintChecklistCategory label="Kinerja Karyawan" value={formC.kinerja} catatan={formC.kinerjaCatatan} />
+          <PrintChecklistCategory label="Potensi Karyawan" value={formC.potensi} catatan={formC.potensiCatatan} />
+          <PrintChecklistCategory label="Pengembangan Karyawan" value={formC.pengembangan} fixedCaptions={PENGEMBANGAN_CAPTIONS} />
         </div>
 
         {[

@@ -52,7 +52,9 @@ export type RecommendationType = 'DI PERPANJANG' | 'TIDAK DI PERPANJANG';
 
 export interface FormCData {
   kinerja: 'Baik' | 'Sedang' | 'Kurang' | '';
+  kinerjaCatatan?: string;
   potensi: 'Baik' | 'Sedang' | 'Kurang' | '';
+  potensiCatatan?: string;
   pengembangan: 'Baik' | 'Sedang' | 'Kurang' | '';
   catatanKasus?: string;
   kesanUmum?: string;
