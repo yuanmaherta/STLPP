@@ -5,3 +5,14 @@
 body {
   min-height: 100vh;
 }
+
+/* Tanpa ini, browser membuang semua warna background saat print/save-as-PDF
+   untuk hemat tinta secara default — termasuk kotak abu-abu penanda skor
+   terpilih di form evaluasi. */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}
