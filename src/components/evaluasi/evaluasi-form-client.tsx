@@ -145,6 +145,15 @@ function GroupBlock({
   );
 }
 
+function scoreCategory(v: number): 'Sangat Baik' | 'Baik' | 'Sedang' | 'Kurang' {
+  if (v === 100) return 'Sangat Baik';
+  if (v === 90) return 'Baik';
+  if (v >= 60) return 'Sedang';
+  return 'Kurang';
+}
+
+const PRINT_CATEGORIES: Array<'Sangat Baik' | 'Baik' | 'Sedang' | 'Kurang'> = ['Sangat Baik', 'Baik', 'Sedang', 'Kurang'];
+
 function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: { formLabel?: string; sectionLabel?: string; subLabel?: string; groups: FormGroup[]; scores: IndicatorScoreMap }) {
   const rows: Array<{ type: 'group' | 'subgroup' | 'item'; no?: number | string; label?: string; item?: FormItem }> = [];
   groups.forEach((g) => {
@@ -165,19 +174,13 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
       <table className="w-full border-collapse border border-black text-[9px]">
         <thead>
           <tr>
-            <th rowSpan={3} className="border border-black w-6 p-1 bg-gray-100">No.</th>
-            <th rowSpan={3} className="border border-black p-1 bg-gray-100">Unsur Penilaian</th>
-            <th colSpan={10} className="border border-black p-1 bg-gray-100">Skor Nilai</th>
+            <th rowSpan={2} className="border border-black w-6 p-1 bg-gray-100">No.</th>
+            <th rowSpan={2} className="border border-black p-1 bg-gray-100">Unsur Penilaian</th>
+            <th colSpan={4} className="border border-black p-1 bg-gray-100">Skor Nilai</th>
           </tr>
           <tr>
-            <th className="border border-black p-1 bg-gray-100">Sangat Baik</th>
-            <th className="border border-black p-1 bg-gray-100">Baik</th>
-            <th colSpan={3} className="border border-black p-1 bg-gray-100">Sedang</th>
-            <th colSpan={5} className="border border-black p-1 bg-gray-100">Kurang</th>
-          </tr>
-          <tr>
-            {SCALE_VALUES.map((v) => (
-              <th key={v} className="border border-black p-1 font-normal bg-gray-100">{v}</th>
+            {PRINT_CATEGORIES.map((cat) => (
+              <th key={cat} className="border border-black p-1 bg-gray-100 w-14">{cat}</th>
             ))}
           </tr>
         </thead>
@@ -187,23 +190,30 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
               return (
                 <tr key={i} className="font-bold bg-gray-200">
                   <td className="border border-black p-1 text-center">{r.no}</td>
-                  <td colSpan={11} className="border border-black p-1">{r.label}</td>
+                  <td colSpan={5} className="border border-black p-1">{r.label}</td>
                 </tr>
               );
             if (r.type === 'subgroup')
               return (
                 <tr key={i} className="font-semibold italic bg-gray-100">
                   <td className="border border-black p-1"></td>
-                  <td colSpan={11} className="border border-black p-1">{r.label}</td>
+                  <td colSpan={5} className="border border-black p-1">{r.label}</td>
                 </tr>
               );
             const it = r.item!;
+            const val = scores[it.id];
+            const cat = val ? scoreCategory(val) : null;
             return (
               <tr key={it.id}>
                 <td className="border border-black p-1"></td>
                 <td className="border border-black p-1 text-left">{it.no}. {it.label}</td>
-                {SCALE_VALUES.map((v) => (
-                  <td key={v} className="border border-black p-1 text-center font-bold">{scores[it.id] === v ? 'X' : ''}</td>
+                {PRINT_CATEGORIES.map((c) => (
+                  <td
+                    key={c}
+                    className={`border border-black p-1 text-center font-bold ${cat === c ? 'bg-gray-500 text-white' : ''}`}
+                  >
+                    {cat === c ? val : ''}
+                  </td>
                 ))}
               </tr>
             );
@@ -361,8 +371,8 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
           <h2 className="font-semibold">PT HUTAMA KARYA (PERSERO)</h2>
         </div>
 
-        {/* Info karyawan - dari master data, tidak bisa diedit di sini */}
-        <table className="w-full mb-6 bg-white border border-gray-200 rounded-lg p-4 print:border-0 print:p-0 print:bg-transparent">
+        {/* Print-only header info, mirrors the original PDF's plain "Label : Value" list */}
+        <table className="w-full mb-6 print:mb-3 bg-white border border-gray-200 rounded-lg p-4 print:border-0 print:p-0 print:bg-transparent">
           <tbody>
             {[
               ['Nama Karyawan', emp.nama],
@@ -376,8 +386,8 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
               ['Periode Evaluasi', assignment.period],
             ].map(([label, val]) => (
               <tr key={label}>
-                <td className="font-bold w-40 align-top py-1 px-4 print:px-0">{label}</td>
-                <td className="align-top py-1">: {val}</td>
+                <td className="font-bold w-40 align-top py-1 print:py-0.5 px-4 print:px-0">{label}</td>
+                <td className="align-top py-1 print:py-0.5">: {val}</td>
               </tr>
             ))}
           </tbody>
@@ -583,10 +593,10 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
         </div>
 
         <div className="hidden print:block mt-8 text-xs">
-          <div className="mb-8">{sig.tempatTanggal || '.....................'}</div>
+          <div className="mb-8 text-right">{sig.tempatTanggal || '.....................'}</div>
           {sig.needBod1 ? (
             <div className="flex justify-between">
-              <div className="w-[45%] text-center">
+              <div className="w-[48%] text-center">
                 <div>&nbsp;</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
@@ -595,7 +605,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
                 </div>
                 <div className="text-[9px] mt-1 italic">(Tanda Tangan Atasan / BOD 1)</div>
               </div>
-              <div className="w-[45%] text-center">
+              <div className="w-[48%] text-center">
                 <div>{emp.divisi}</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
@@ -607,7 +617,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
             </div>
           ) : (
             <div className="flex justify-end">
-              <div className="w-[45%] text-center">
+              <div className="w-[48%] text-center">
                 <div>{emp.divisi}</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
