@@ -1,15 +1,22 @@
-import { FileEdit } from 'lucide-react';
-import { ComingSoon } from '@/components/layout/coming-soon';
+import { createClient } from '@/lib/supabase/server';
+import { getActiveTemplate } from '@/lib/data/template-loader';
+import { TemplateEditorClient } from '@/components/template/template-editor-client';
 
-export default function TemplateFormPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function TemplateFormPage() {
+  const supabase = createClient();
+  const active = await getActiveTemplate(supabase);
+
+  const { data: history } = await supabase
+    .from('form_templates')
+    .select('id, version, title, is_active, created_at')
+    .order('created_at', { ascending: false });
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Template Form Evaluasi</h1>
-      <ComingSoon
-        title="Form Builder Kompetensi"
-        description="Editor untuk menambah/mengubah/menonaktifkan indikator kompetensi dengan sistem versi akan tampil di sini, tersambung ke tabel form_templates."
-        icon={FileEdit}
-      />
+      <TemplateEditorClient initialStructure={active.structure} activeVersion={active.version} history={history ?? []} />
     </div>
   );
 }

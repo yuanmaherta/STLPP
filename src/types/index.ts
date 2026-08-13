@@ -78,6 +78,7 @@ export interface FormItem {
   id: string;
   no: string;
   label: string;
+  active?: boolean; // default true kalau tidak diisi; false = dinonaktifkan admin
 }
 
 export interface FormSubgroup {

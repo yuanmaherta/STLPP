@@ -14,11 +14,11 @@ import {
   Loader2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { DEFAULT_FORM_STRUCTURE, getAllFormItemIds } from '@/lib/data/form-default';
+import { getAllFormItemIds } from '@/lib/data/form-default';
 import { calculateEvaluationStats, SCALE_VALUES, getScaleLabel, getScaleBadgeColor } from '@/lib/utils/scoring';
-import type { FormGroup, FormItem, IndicatorScoreMap, FormCData } from '@/types';
+import type { FormGroup, FormItem, IndicatorScoreMap, FormCData, FormTemplateStructure } from '@/types';
 
-const { formAItemIds, formBItemIds } = getAllFormItemIds(DEFAULT_FORM_STRUCTURE);
+
 
 const BULAN_ID = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -94,6 +94,8 @@ interface EvaluasiFormClientProps {
   assignment: AssignmentInfo;
   existingEvaluation: ExistingEvaluation | null;
   evaluatorName: string;
+  formStructure: FormTemplateStructure;
+  templateVersion: string;
 }
 
 function ScoreRow({ item, value, onChange, readOnly }: { item: FormItem; value?: number; onChange: (id: string, v: number) => void; readOnly: boolean }) {
@@ -339,10 +341,17 @@ function PrintChecklistCategory({
   );
 }
 
-export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorName }: EvaluasiFormClientProps) {
+export function EvaluasiFormClient({
+  assignment,
+  existingEvaluation,
+  evaluatorName,
+  formStructure,
+  templateVersion,
+}: EvaluasiFormClientProps) {
   const router = useRouter();
   const readOnly = assignment.status === 'COMPLETED';
   const emp = assignment.employee;
+  const { formAItemIds, formBItemIds } = useMemo(() => getAllFormItemIds(formStructure), [formStructure]);
 
   const [scores, setScores] = useState<IndicatorScoreMap>(existingEvaluation?.scores ?? {});
   const [durasi, setDurasi] = useState(existingEvaluation?.duration && ['12', '6'].includes(existingEvaluation.duration) ? existingEvaluation.duration : '12');
@@ -399,7 +408,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
 
       const { error: insertError } = await supabase.from('evaluations').insert({
         assignment_id: assignment.id,
-        template_version: 'v1.0',
+        template_version: templateVersion,
         scores,
         grand_avg: stats.grandAvg,
         recommendation: stats.recommendation,
@@ -496,11 +505,11 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
           <h2 className="font-bold text-blue-900 mb-1">FORM A</h2>
           <h3 className="font-semibold text-blue-800 mb-2 text-sm underline">A. Penilaian Capacity Kompetensi</h3>
           <div className="text-xs text-gray-500 mb-2">A1. Penilaian Kompetensi</div>
-          {DEFAULT_FORM_STRUCTURE.formA1.map((g) => (
+          {formStructure.formA1.map((g) => (
             <GroupBlock key={g.group} group={g} scores={scores} onChange={setScore} readOnly={readOnly} />
           ))}
           <div className="text-xs text-gray-500 mb-2 mt-4">A2. Penilaian Learning Agility</div>
-          {DEFAULT_FORM_STRUCTURE.formA2.map((g) => (
+          {formStructure.formA2.map((g) => (
             <GroupBlock key={g.group} group={g} scores={scores} onChange={setScore} readOnly={readOnly} />
           ))}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex justify-between text-sm font-semibold text-blue-900 mb-6">
@@ -510,10 +519,10 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
 
           <h2 className="font-bold text-blue-900 mb-1">FORM B</h2>
           <h3 className="font-semibold text-blue-800 mb-2 text-sm underline">B. Penilaian Performance</h3>
-          {DEFAULT_FORM_STRUCTURE.formB1.map((g) => (
+          {formStructure.formB1.map((g) => (
             <GroupBlock key={g.group} group={g} scores={scores} onChange={setScore} readOnly={readOnly} />
           ))}
-          {DEFAULT_FORM_STRUCTURE.formB2.map((g) => (
+          {formStructure.formB2.map((g) => (
             <GroupBlock key={g.group} group={g} scores={scores} onChange={setScore} readOnly={readOnly} />
           ))}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex justify-between text-sm font-semibold text-blue-900 mb-2">
@@ -532,8 +541,8 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
           sectionLabel="A. Penilaian Capacity Kompetensi"
           subLabel="A1. Penilaian Kompetensi"
           groups={[
-            ...DEFAULT_FORM_STRUCTURE.formA1,
-            ...DEFAULT_FORM_STRUCTURE.formA2.map((g, idx) =>
+            ...formStructure.formA1,
+            ...formStructure.formA2.map((g, idx) =>
               idx === 0 ? { ...g, sectionDivider: 'A2. Penilaian Learning Agility' } : g
             ),
           ]}
@@ -545,7 +554,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
           <span>Rata-Rata Nilai (A1+A2)</span>
           <span>{stats.formA.avg.toFixed(2)}</span>
         </div>
-        <PrintScoreTable formLabel="FORM B" sectionLabel="B. Penilaian Performance" groups={[...DEFAULT_FORM_STRUCTURE.formB1, ...DEFAULT_FORM_STRUCTURE.formB2]} scores={scores} />
+        <PrintScoreTable formLabel="FORM B" sectionLabel="B. Penilaian Performance" groups={[...formStructure.formB1, ...formStructure.formB2]} scores={scores} />
         <div className="hidden print:flex justify-between text-xs font-bold border border-black p-2 -mt-6 mb-2">
           <span>Total Nilai (B1+B2)</span>
           <span>{stats.formB.total}</span>

@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { EvaluasiFormClient } from '@/components/evaluasi/evaluasi-form-client';
+import { getActiveTemplate, getTemplateByVersion } from '@/lib/data/template-loader';
+import { filterActiveStructure } from '@/lib/utils/template-helpers';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +26,9 @@ export default async function IsiFormEvaluasiPage({ params }: { params: { assign
   }
 
   let existingEvaluation = null;
+  let formStructure;
+  let templateVersion: string;
+
   if ((assignment as any).status === 'COMPLETED') {
     const { data: evalData } = await supabase
       .from('evaluations')
@@ -31,6 +36,14 @@ export default async function IsiFormEvaluasiPage({ params }: { params: { assign
       .eq('assignment_id', params.assignmentId)
       .single();
     existingEvaluation = evalData;
+    // Render pakai struktur PERSIS seperti versi yang dipakai waktu submit dulu,
+    // bukan versi template yang aktif sekarang (supaya penilaian lama tidak berubah)
+    templateVersion = evalData?.template_version ?? 'v1.0';
+    formStructure = await getTemplateByVersion(supabase, templateVersion);
+  } else {
+    const active = await getActiveTemplate(supabase);
+    templateVersion = active.version;
+    formStructure = filterActiveStructure(active.structure);
   }
 
   return (
@@ -38,6 +51,8 @@ export default async function IsiFormEvaluasiPage({ params }: { params: { assign
       assignment={assignment as any}
       existingEvaluation={existingEvaluation as any}
       evaluatorName={(assignment as any).evaluator?.name ?? ''}
+      formStructure={formStructure}
+      templateVersion={templateVersion}
     />
   );
 }
