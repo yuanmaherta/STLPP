@@ -39,32 +39,41 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
     setSaving(true);
     setFormError('');
 
-    const res = await fetch('/api/admin/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    const result = await res.json();
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
 
-    if (!res.ok) {
-      setFormError(result.error ?? 'Gagal membuat akun.');
+      let result: any = null;
+      try {
+        result = await res.json();
+      } catch {
+        throw new Error(`Server merespons tidak sesuai (status ${res.status}). Cek log server / Vercel.`);
+      }
+
+      if (!res.ok) {
+        throw new Error(result?.error ?? `Gagal membuat akun (status ${res.status}).`);
+      }
+
+      setUsers((prev) => [
+        ...prev,
+        {
+          id: result.id,
+          name: form.name,
+          email: form.email,
+          role: form.role,
+          division: null,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+      setModalOpen(false);
+    } catch (err: any) {
+      setFormError(err.message ?? 'Gagal membuat akun. Coba lagi.');
+    } finally {
       setSaving(false);
-      return;
     }
-
-    setUsers((prev) => [
-      ...prev,
-      {
-        id: result.id,
-        name: form.name,
-        email: form.email,
-        role: form.role,
-        division: null,
-        created_at: new Date().toISOString(),
-      },
-    ]);
-    setSaving(false);
-    setModalOpen(false);
   };
 
   const handleDelete = async (u: UserRow) => {
@@ -75,15 +84,23 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
     if (!confirm(`Hapus akun "${u.name}" (${u.email})? Tindakan ini tidak bisa dibatalkan.`)) return;
 
     setDeletingId(u.id);
-    const res = await fetch(`/api/admin/users/${u.id}`, { method: 'DELETE' });
-    const result = await res.json();
-
-    if (!res.ok) {
-      alert(`Gagal menghapus: ${result.error}`);
-    } else {
+    try {
+      const res = await fetch(`/api/admin/users/${u.id}`, { method: 'DELETE' });
+      let result: any = null;
+      try {
+        result = await res.json();
+      } catch {
+        throw new Error(`Server merespons tidak sesuai (status ${res.status}).`);
+      }
+      if (!res.ok) {
+        throw new Error(result?.error ?? `Gagal menghapus (status ${res.status}).`);
+      }
       setUsers((prev) => prev.filter((x) => x.id !== u.id));
+    } catch (err: any) {
+      alert(`Gagal menghapus: ${err.message}`);
+    } finally {
+      setDeletingId(null);
     }
-    setDeletingId(null);
   };
 
   return (
