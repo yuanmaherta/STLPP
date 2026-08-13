@@ -146,8 +146,10 @@ function GroupBlock({
 }
 
 function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: { formLabel?: string; sectionLabel?: string; subLabel?: string; groups: FormGroup[]; scores: IndicatorScoreMap }) {
-  const rows: Array<{ type: 'group' | 'subgroup' | 'item'; no?: number | string; label?: string; item?: FormItem }> = [];
+  const rows: Array<{ type: 'group' | 'subgroup' | 'item' | 'divider'; no?: number | string; label?: string; item?: FormItem }> = [];
   groups.forEach((g) => {
+    const divider = (g as any).sectionDivider as string | undefined;
+    if (divider) rows.push({ type: 'divider', label: divider });
     rows.push({ type: 'group', no: g.no, label: g.group });
     if (g.items) g.items.forEach((it) => rows.push({ type: 'item', item: it }));
     if (g.subgroups)
@@ -178,6 +180,14 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
         </thead>
         <tbody>
           {rows.map((r, i) => {
+            if (r.type === 'divider')
+              return (
+                <tr key={i}>
+                  <td colSpan={12} className="border-x border-black p-1 pt-3 font-bold text-xs bg-white">
+                    {r.label}
+                  </td>
+                </tr>
+              );
             if (r.type === 'group')
               return (
                 <tr key={i} className="font-bold bg-gray-200">
@@ -201,7 +211,7 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
                   <td
                     key={v}
                     className={`border border-black p-1 text-center align-middle ${
-                      scores[it.id] === v ? 'bg-gray-600 text-white font-bold' : ''
+                      scores[it.id] === v ? 'bg-gray-300 font-bold' : ''
                     }`}
                   >
                     {v}
@@ -439,8 +449,6 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
               ['Divisi', emp.divisi],
               ['Bagian', emp.bagian ?? '-'],
               ['Masa Kerja', emp.masa_kerja ?? '-'],
-              ['Status Kontrak', emp.status_kontrak],
-              ['Periode Evaluasi', assignment.period],
             ].map(([label, val]) => (
               <tr key={label}>
                 <td className="font-bold w-40 align-top py-1 print:py-0.5 px-4 print:px-0">{label}</td>
@@ -486,8 +494,18 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
         </div>
 
         {/* Print-only tables */}
-        <PrintScoreTable formLabel="FORM A" sectionLabel="A. Penilaian Capacity Kompetensi" subLabel="A1. Penilaian Kompetensi" groups={DEFAULT_FORM_STRUCTURE.formA1} scores={scores} />
-        <PrintScoreTable subLabel="A2. Penilaian Learning Agility" groups={DEFAULT_FORM_STRUCTURE.formA2} scores={scores} />
+        <PrintScoreTable
+          formLabel="FORM A"
+          sectionLabel="A. Penilaian Capacity Kompetensi"
+          subLabel="A1. Penilaian Kompetensi"
+          groups={[
+            ...DEFAULT_FORM_STRUCTURE.formA1,
+            ...DEFAULT_FORM_STRUCTURE.formA2.map((g, idx) =>
+              idx === 0 ? { ...g, sectionDivider: 'A2. Penilaian Learning Agility' } : g
+            ),
+          ]}
+          scores={scores}
+        />
         <div className="hidden print:flex justify-between text-xs font-bold border border-black p-2 -mt-6 mb-6">
           <span>Total Nilai (A1+A2)</span>
           <span>{stats.formA.total}</span>
@@ -668,7 +686,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
               <div className="w-[48%] text-center">
                 <div>&nbsp;</div>
                 <div>Disetujui oleh,</div>
-                <div className="h-14"></div>
+                <div className="h-24"></div>
                 <div className="border-t border-black pt-1">
                   <div className="font-bold underline">{sig.bod1Nama || '( ..................................... )'}</div>
                   <div>{sig.bod1Jabatan}</div>
@@ -678,7 +696,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
                 <div>{sig.tempatTanggal || '.....................'}</div>
                 <div>PT Hutama Karya (Persero)</div>
                 <div>Diisi oleh,</div>
-                <div className="h-14"></div>
+                <div className="h-24"></div>
                 <div className="border-t border-black pt-1">
                   <div className="font-bold underline">{sig.penilaiNama || '( ..................................... )'}</div>
                   <div>{sig.penilaiJabatan}</div>
@@ -691,7 +709,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
                 <div>{sig.tempatTanggal || '.....................'}</div>
                 <div>PT Hutama Karya (Persero)</div>
                 <div>Diisi oleh,</div>
-                <div className="h-14"></div>
+                <div className="h-24"></div>
                 <div className="border-t border-black pt-1">
                   <div className="font-bold underline">{sig.penilaiNama || '( ..................................... )'}</div>
                   <div>{sig.penilaiJabatan}</div>
