@@ -1,10 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Search, Download, FileSpreadsheet, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Search, FileSpreadsheet, FileText, Loader2, AlertCircle, X } from 'lucide-react';
+import { durasiLabel } from '@/lib/utils/report-helpers';
 
 interface EvalRow {
   id: string;
+  scores: Record<string, number>;
   grand_avg: number;
   recommendation: string;
   duration: string | null;
@@ -21,6 +23,8 @@ interface EvalRow {
       divisi: string;
       bagian: string | null;
       masa_kerja: string | null;
+      tgl_lahir: string | null;
+      tgl_habis_kontrak: string | null;
     } | null;
     evaluator: { name: string } | null;
   } | null;
@@ -31,12 +35,21 @@ interface LaporanClientProps {
   loadError: string | null;
 }
 
+interface EditEntry {
+  rekomendasi: string;
+  keteranganRekomendasi: string;
+  keterangan: string;
+}
+
 export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
   const [search, setSearch] = useState('');
   const [divisiFilter, setDivisiFilter] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [exporting, setExporting] = useState<'excel' | 'pdf' | null>(null);
   const [exportError, setExportError] = useState('');
+
+  const [modalType, setModalType] = useState<'excel' | 'pdf' | null>(null);
+  const [editState, setEditState] = useState<Record<string, EditEntry>>({});
+  const [downloading, setDownloading] = useState(false);
 
   const divisions = useMemo(() => {
     const set = new Set<string>();
@@ -59,11 +72,8 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
   const toggleAll = () => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (allFilteredSelected) {
-        filtered.forEach((r) => next.delete(r.id));
-      } else {
-        filtered.forEach((r) => next.add(r.id));
-      }
+      if (allFilteredSelected) filtered.forEach((r) => next.delete(r.id));
+      else filtered.forEach((r) => next.add(r.id));
       return next;
     });
   };
@@ -79,18 +89,56 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
 
   const selectedRows = initialRows.filter((r) => selected.has(r.id));
 
-  const handleExport = async (type: 'excel' | 'pdf') => {
+  // Judul laporan mengikuti divisi yang difilter; kalau tidak difilter tapi semua baris
+  // terpilih kebetulan 1 divisi yang sama, pakai itu juga. Kalau campur, tandai "Berbagai Divisi".
+  const reportTitle = useMemo(() => {
+    if (divisiFilter) return divisiFilter;
+    const divisiSet = new Set(selectedRows.map((r) => r.assignment?.employee?.divisi).filter(Boolean));
+    if (divisiSet.size === 1) return Array.from(divisiSet)[0] as string;
+    if (divisiSet.size > 1) return 'Berbagai Divisi';
+    return 'Semua Divisi';
+  }, [divisiFilter, selectedRows]);
+
+  const openExportModal = (type: 'excel' | 'pdf') => {
     if (selectedRows.length === 0) {
       setExportError('Pilih minimal 1 karyawan dulu (centang di kolom kiri tabel).');
       return;
     }
-    setExporting(type);
+    setExportError('');
+    // Siapkan draft edit untuk tiap baris terpilih, pre-fill dari data otomatis
+    setEditState((prev) => {
+      const next = { ...prev };
+      selectedRows.forEach((r) => {
+        if (!next[r.id]) {
+          next[r.id] = {
+            rekomendasi: durasiLabel(r.recommendation, r.duration),
+            keteranganRekomendasi: r.recommendation === 'DI PERPANJANG' ? 'Hasil evaluasi memenuhi minimal standard.' : '',
+            keterangan: '',
+          };
+        }
+      });
+      return next;
+    });
+    setModalType(type);
+  };
+
+  const updateEdit = (id: string, field: keyof EditEntry, value: string) => {
+    setEditState((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
+  };
+
+  const handleDownload = async () => {
+    if (!modalType) return;
+    setDownloading(true);
     setExportError('');
     try {
-      const res = await fetch(`/api/admin/report/${type}`, {
+      const res = await fetch(`/api/admin/report/${modalType}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows: selectedRows }),
+        body: JSON.stringify({
+          rows: selectedRows,
+          edits: selectedRows.map((r) => ({ id: r.id, ...editState[r.id] })),
+          title: reportTitle,
+        }),
       });
       if (!res.ok) {
         let msg = `Export gagal (status ${res.status}).`;
@@ -104,15 +152,16 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `laporan-stlpp-${new Date().toISOString().slice(0, 10)}.${type === 'excel' ? 'xlsx' : 'pdf'}`;
+      a.download = `laporan-stlpp-${reportTitle.replace(/\s+/g, '-').toLowerCase()}.${modalType === 'excel' ? 'xlsx' : 'pdf'}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      setModalType(null);
     } catch (err: any) {
       setExportError(err.message ?? 'Gagal export.');
     } finally {
-      setExporting(null);
+      setDownloading(false);
     }
   };
 
@@ -124,7 +173,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
           Gagal memuat data: {loadError}
         </div>
       )}
-      {exportError && (
+      {exportError && !modalType && (
         <div className="mb-4 flex items-center gap-2 text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-4 py-3">
           <AlertCircle className="w-4 h-4 shrink-0" />
           {exportError}
@@ -160,18 +209,16 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-400 mr-2">{selected.size} dipilih</span>
             <button
-              onClick={() => handleExport('excel')}
-              disabled={exporting !== null}
-              className="flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50"
+              onClick={() => openExportModal('excel')}
+              className="flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700"
             >
-              {exporting === 'excel' ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />} Excel
+              <FileSpreadsheet className="w-4 h-4" /> Excel
             </button>
             <button
-              onClick={() => handleExport('pdf')}
-              disabled={exporting !== null}
-              className="flex items-center gap-1.5 bg-rose-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-rose-700 disabled:opacity-50"
+              onClick={() => openExportModal('pdf')}
+              className="flex items-center gap-1.5 bg-rose-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-rose-700"
             >
-              {exporting === 'pdf' ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />} PDF
+              <FileText className="w-4 h-4" /> PDF
             </button>
           </div>
         </div>
@@ -232,6 +279,84 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
           </table>
         </div>
       </div>
+
+      {modalType && (
+        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div>
+                <h2 className="font-bold text-slate-800">Lengkapi sebelum export {modalType === 'excel' ? 'Excel' : 'PDF'}</h2>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Judul laporan: <span className="font-semibold">{reportTitle}</span> — {selectedRows.length} karyawan
+                </p>
+              </div>
+              <button onClick={() => !downloading && setModalType(null)} className="text-slate-400 hover:text-slate-600">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {exportError && (
+                <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{exportError}</div>
+              )}
+              {selectedRows.map((r) => {
+                const emp = r.assignment?.employee;
+                const edit = editState[r.id] ?? { rekomendasi: '', keteranganRekomendasi: '', keterangan: '' };
+                return (
+                  <div key={r.id} className="border border-slate-200 rounded-lg p-4">
+                    <p className="font-semibold text-sm text-slate-800 mb-3">{emp?.nama}</p>
+                    <label className="block text-xs mb-2">
+                      <span className="block text-slate-500 mb-1">Rekomendasi</span>
+                      <input
+                        value={edit.rekomendasi}
+                        onChange={(e) => updateEdit(r.id, 'rekomendasi', e.target.value)}
+                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                    <label className="block text-xs mb-2">
+                      <span className="block text-slate-500 mb-1">Keterangan Rekomendasi</span>
+                      <textarea
+                        rows={3}
+                        value={edit.keteranganRekomendasi}
+                        onChange={(e) => updateEdit(r.id, 'keteranganRekomendasi', e.target.value)}
+                        placeholder="cth: 1. Hasil evaluasi memenuhi minimal standard. 2. Dilakukan perpanjangan sesuai Nota Dinas Nomor ..."
+                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                    <label className="block text-xs">
+                      <span className="block text-slate-500 mb-1">Keterangan</span>
+                      <input
+                        value={edit.keterangan}
+                        onChange={(e) => updateEdit(r.id, 'keterangan', e.target.value)}
+                        placeholder="cth: Kontrak Pusat"
+                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      />
+                    </label>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-slate-200">
+              <button
+                onClick={() => setModalType(null)}
+                disabled={downloading}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+              >
+                {downloading && <Loader2 className="w-4 h-4 animate-spin" />}
+                Download {modalType === 'excel' ? 'Excel' : 'PDF'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,7 @@ export default async function LaporanPage() {
   const { data: rows, error } = await supabase
     .from('evaluations')
     .select(
-      'id, grand_avg, recommendation, duration, form_c_data, submitted_at, assignment:assignments(id, period, employee:employees(id, nik, nama, jabatan, divisi, bagian, masa_kerja), evaluator:users(name))'
+      'id, scores, grand_avg, recommendation, duration, form_c_data, submitted_at, assignment:assignments(id, period, employee:employees(id, nik, nama, jabatan, divisi, bagian, masa_kerja, tgl_lahir, tgl_habis_kontrak), evaluator:users(name))'
     )
     .order('submitted_at', { ascending: false });
 
