@@ -145,15 +145,6 @@ function GroupBlock({
   );
 }
 
-function scoreCategory(v: number): 'Sangat Baik' | 'Baik' | 'Sedang' | 'Kurang' {
-  if (v === 100) return 'Sangat Baik';
-  if (v === 90) return 'Baik';
-  if (v >= 60) return 'Sedang';
-  return 'Kurang';
-}
-
-const PRINT_CATEGORIES: Array<'Sangat Baik' | 'Baik' | 'Sedang' | 'Kurang'> = ['Sangat Baik', 'Baik', 'Sedang', 'Kurang'];
-
 function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: { formLabel?: string; sectionLabel?: string; subLabel?: string; groups: FormGroup[]; scores: IndicatorScoreMap }) {
   const rows: Array<{ type: 'group' | 'subgroup' | 'item'; no?: number | string; label?: string; item?: FormItem }> = [];
   groups.forEach((g) => {
@@ -176,12 +167,13 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
           <tr>
             <th rowSpan={2} className="border border-black w-6 p-1 bg-gray-100">No.</th>
             <th rowSpan={2} className="border border-black p-1 bg-gray-100">Unsur Penilaian</th>
-            <th colSpan={4} className="border border-black p-1 bg-gray-100">Skor Nilai</th>
+            <th colSpan={10} className="border border-black p-1 bg-gray-100">Skor Nilai</th>
           </tr>
           <tr>
-            {PRINT_CATEGORIES.map((cat) => (
-              <th key={cat} className="border border-black p-1 bg-gray-100 w-14">{cat}</th>
-            ))}
+            <th className="border border-black p-1 bg-gray-100">Sangat Baik</th>
+            <th className="border border-black p-1 bg-gray-100">Baik</th>
+            <th colSpan={3} className="border border-black p-1 bg-gray-100">Sedang</th>
+            <th colSpan={5} className="border border-black p-1 bg-gray-100">Kurang</th>
           </tr>
         </thead>
         <tbody>
@@ -190,29 +182,28 @@ function PrintScoreTable({ formLabel, sectionLabel, subLabel, groups, scores }: 
               return (
                 <tr key={i} className="font-bold bg-gray-200">
                   <td className="border border-black p-1 text-center">{r.no}</td>
-                  <td colSpan={5} className="border border-black p-1">{r.label}</td>
+                  <td colSpan={11} className="border border-black p-1">{r.label}</td>
                 </tr>
               );
             if (r.type === 'subgroup')
               return (
                 <tr key={i} className="font-semibold italic bg-gray-100">
                   <td className="border border-black p-1"></td>
-                  <td colSpan={5} className="border border-black p-1">{r.label}</td>
+                  <td colSpan={11} className="border border-black p-1">{r.label}</td>
                 </tr>
               );
             const it = r.item!;
-            const val = scores[it.id];
-            const cat = val ? scoreCategory(val) : null;
             return (
               <tr key={it.id}>
                 <td className="border border-black p-1"></td>
                 <td className="border border-black p-1 text-left">{it.no}. {it.label}</td>
-                {PRINT_CATEGORIES.map((c) => (
-                  <td
-                    key={c}
-                    className={`border border-black p-1 text-center font-bold ${cat === c ? 'bg-gray-500 text-white' : ''}`}
-                  >
-                    {cat === c ? val : ''}
+                {SCALE_VALUES.map((v) => (
+                  <td key={v} className="border border-black p-1 text-center align-middle">
+                    {scores[it.id] === v ? (
+                      <span className="inline-flex items-center justify-center w-5 h-5 rounded-full border-2 border-black font-bold">{v}</span>
+                    ) : (
+                      v
+                    )}
                   </td>
                 ))}
               </tr>
