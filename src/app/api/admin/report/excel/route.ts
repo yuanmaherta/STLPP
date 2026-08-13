@@ -3,27 +3,41 @@ import ExcelJS from 'exceljs';
 import { createClient } from '@/lib/supabase/server';
 import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
 
-const FONT = 'Arial';
-const grayFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } };
-const lightGreenFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
-const blueFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBDD7EE' } };
-const greenFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6E0B4' } };
-const amberFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFE699' } };
-const navyFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F3864' } };
+// ====================================================================
+// Warna & font ini dibaca LANGSUNG dari file RPPK-INFRA_II asli (bukan
+// tebakan) — theme colors dihitung dari clrScheme + tint workbook itu:
+//   accent1 (biru)  = 4472C4  |  accent4 (emas) = FFC000
+//   accent6 (hijau) = 70AD47  |  lt1 (putih)     = FFFFFF
+// ====================================================================
+const FONT = 'Times New Roman';
+const FONT_SIZE = 18;
+
+const grayFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBFBFBF' } }; // lt1 tint -0.25
+const blueFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB4C7E7' } }; // accent1 tint +0.6
+const brightGreenFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF92D050' } }; // literal, sama seperti file asli
+const paleGreenFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } }; // accent6 tint +0.8
+const paleGoldFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } }; // accent4 tint +0.8
+const darkBlueFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF335593' } }; // accent1 tint -0.25
+
 const thin: ExcelJS.Border = { style: 'thin', color: { argb: 'FF000000' } };
 const allBorders = { top: thin, left: thin, bottom: thin, right: thin };
 const wrapCenter: Partial<ExcelJS.Alignment> = { wrapText: true, vertical: 'middle', horizontal: 'center' };
 const wrapLeft: Partial<ExcelJS.Alignment> = { wrapText: true, vertical: 'middle', horizontal: 'left' };
 
 function styleHeaderCell(cell: ExcelJS.Cell, fill: ExcelJS.Fill, white = false) {
-  cell.font = { name: FONT, bold: true, size: 9, color: white ? { argb: 'FFFFFFFF' } : undefined };
+  cell.font = { name: FONT, bold: true, size: FONT_SIZE, color: white ? { argb: 'FFFFFFFF' } : undefined };
   cell.fill = fill;
   cell.alignment = wrapCenter;
   cell.border = allBorders;
 }
 
-const fmtInt = (n: number) => n.toLocaleString('id-ID');
-const fmtDec = (n: number) => n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+function styleDataCell(cell: ExcelJS.Cell, align: Partial<ExcelJS.Alignment> = wrapCenter) {
+  cell.font = { name: FONT, size: FONT_SIZE };
+  cell.alignment = align;
+  cell.border = allBorders;
+  // Sengaja TANPA fill — file asli membiarkan baris data putih polos.
+}
+
 const orDash = (v: string | null | undefined) => (v && v.trim() ? v : '-');
 
 export async function POST(request: Request) {
@@ -48,22 +62,22 @@ export async function POST(request: Request) {
   const workbook = new ExcelJS.Workbook();
 
   // =========================================================
-  // SHEET 1: Rekap Hal. 1 - status kontrak & approval (abu-abu + hijau muda)
+  // SHEET 1: Rekap Hal. 1
   // =========================================================
   const ws1 = workbook.addWorksheet('Rekap Hal. 1');
-  ws1.mergeCells('A1:N1');
+  ws1.mergeCells('A1:O1');
   ws1.getCell('A1').value = 'EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT';
-  ws1.getCell('A1').font = { name: FONT, bold: true, size: 14 };
+  ws1.getCell('A1').font = { name: FONT, bold: true, size: FONT_SIZE };
   ws1.getCell('A1').alignment = { horizontal: 'center' };
 
-  ws1.mergeCells('A2:N2');
+  ws1.mergeCells('A2:O2');
   ws1.getCell('A2').value = title.toUpperCase();
-  ws1.getCell('A2').font = { name: FONT, bold: true, size: 12 };
+  ws1.getCell('A2').font = { name: FONT, bold: true, size: FONT_SIZE };
   ws1.getCell('A2').alignment = { horizontal: 'center' };
 
   const h1Simple: [string, string][] = [
     ['A', 'No'], ['B', 'Nama'], ['C', 'Jabatan/Posisi'], ['D', 'Unit Kerja'],
-    ['E', 'Usia'], ['F', 'Masa Kerja dari\nkontrak I (th)'], ['G', 'Periode Akhir\nKontrak'],
+    ['E', 'Usia'], ['F', 'Masa Kerja dari kontrak I (th)'], ['G', 'Periode Akhir Kontrak'],
   ];
   h1Simple.forEach(([col, label]) => {
     ws1.mergeCells(`${col}4:${col}6`);
@@ -76,9 +90,9 @@ export async function POST(request: Request) {
   ws1.getCell('H4').value = 'Keberlanjutan Kontrak Kerja';
 
   const groupLabels: [string, string, string][] = [
-    ['H5', 'I5', 'Tidak dilakukan perpanjangan\nkontrak'],
-    ['J5', 'K5', 'Dilakukan perpanjangan kontrak\nselama 6 Bulan'],
-    ['L5', 'M5', 'Dilakukan perpanjangan kontrak\nselama 1 Tahun'],
+    ['H5', 'I5', 'Tidak dilakukan perpanjangan kontrak'],
+    ['J5', 'K5', 'Dilakukan perpanjangan kontrak selama 6 Bulan'],
+    ['L5', 'M5', 'Dilakukan perpanjangan kontrak selama 1 Tahun'],
   ];
   groupLabels.forEach(([start, end, label]) => {
     ws1.mergeCells(`${start}:${end}`);
@@ -99,11 +113,14 @@ export async function POST(request: Request) {
   styleHeaderCell(ws1.getCell('O4'), grayFill);
   ws1.getCell('O4').value = 'Keterangan';
 
-  const widths1: Record<string, number> = { A: 4, B: 18, C: 26, D: 18, E: 7, F: 11, G: 11, H: 20, I: 12, J: 20, K: 12, L: 20, M: 12, N: 32, O: 12 };
+  // Lebar kolom persis dari file RPPK-INFRA_II asli
+  const widths1: Record<string, number> = { A: 8.6, B: 39.6, C: 39.3, D: 32.7, E: 18.4, F: 28.4, G: 20, H: 28.7, I: 28.6, J: 35.3, K: 25.4, L: 36.3, M: 27.6, N: 63.3, O: 25.6 };
   Object.entries(widths1).forEach(([col, w]) => (ws1.getColumn(col).width = w));
-  ws1.getRow(4).height = 20;
-  ws1.getRow(5).height = 30;
-  ws1.getRow(6).height = 16;
+  ws1.getRow(1).height = 34;
+  ws1.getRow(2).height = 22;
+  ws1.getRow(4).height = 44;
+  ws1.getRow(5).height = 50;
+  ws1.getRow(6).height = 35;
 
   let r1 = 7;
   rows.forEach((row: any, i: number) => {
@@ -122,22 +139,16 @@ export async function POST(request: Request) {
       O: orDash(edit.keterangan),
     };
     Object.entries(baseValues).forEach(([col, val]) => {
-      const cell = ws1.getCell(`${col}${r1}`);
-      cell.value = val;
-      cell.font = { name: FONT, size: 9 };
-      cell.alignment = ['B', 'C', 'D', 'N'].includes(col) ? wrapLeft : wrapCenter;
-      cell.fill = lightGreenFill;
-      cell.border = allBorders;
+      styleDataCell(ws1.getCell(`${col}${r1}`), col === 'N' ? wrapLeft : wrapCenter);
+      ws1.getCell(`${col}${r1}`).value = val;
     });
+    if (emp?.tgl_habis_kontrak) {
+      const gCell = ws1.getCell(`G${r1}`);
+      gCell.value = new Date(emp.tgl_habis_kontrak);
+      gCell.numFmt = 'dd mmm yyyy';
+    }
 
-    // Isi status + checkbox di pasangan kolom EVP HC/DHCL yang sesuai; sisanya kosong (tetap hijau muda)
-    ['H', 'I', 'J', 'K', 'L', 'M'].forEach((col) => {
-      const cell = ws1.getCell(`${col}${r1}`);
-      cell.fill = lightGreenFill;
-      cell.border = allBorders;
-      cell.font = { name: FONT, size: 9 };
-      cell.alignment = wrapCenter;
-    });
+    ['H', 'I', 'J', 'K', 'L', 'M'].forEach((col) => styleDataCell(ws1.getCell(`${col}${r1}`)));
 
     const lulus = row.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
     const statusText = `${lulus}\n\n${edit.rekomendasi ?? ''}`;
@@ -147,10 +158,10 @@ export async function POST(request: Request) {
       row.recommendation !== 'DI PERPANJANG' ? ['H', 'I'] : row.duration === '6' ? ['J', 'K'] : ['L', 'M'];
 
     ws1.getCell(`${evpCol}${r1}`).value = statusText;
-    ws1.getCell(`${evpCol}${r1}`).font = { name: FONT, bold: true, size: 9 };
     ws1.getCell(`${dhclCol}${r1}`).value = checkboxText;
+    ws1.getCell(`${dhclCol}${r1}`).alignment = { wrapText: true, vertical: 'middle', horizontal: 'left' };
 
-    ws1.getRow(r1).height = 75;
+    ws1.getRow(r1).height = 240;
     r1++;
   });
 
@@ -158,44 +169,44 @@ export async function POST(request: Request) {
   r1 += 2;
   ws1.mergeCells(`I${r1}:O${r1}`);
   ws1.getCell(`I${r1}`).value = sign.tempatTanggal || '';
-  ws1.getCell(`I${r1}`).font = { name: FONT, size: 10 };
+  ws1.getCell(`I${r1}`).font = { name: FONT, size: 12 };
   r1 += 2;
   ws1.mergeCells(`B${r1}:D${r1}`);
   ws1.getCell(`B${r1}`).value = 'Menyetujui,';
   ws1.mergeCells(`I${r1}:O${r1}`);
   ws1.getCell(`I${r1}`).value = 'Mengajukan,';
-  [`B${r1}`, `I${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 10 }));
+  [`B${r1}`, `I${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 12 }));
   r1 += 4;
   ws1.mergeCells(`B${r1}:D${r1}`);
   ws1.getCell(`B${r1}`).value = sign.namaMenyetujui || '( ..................................... )';
-  ws1.getCell(`B${r1}`).font = { name: FONT, bold: true, size: 10, underline: true };
+  ws1.getCell(`B${r1}`).font = { name: FONT, bold: true, size: 12, underline: true };
   ws1.mergeCells(`I${r1}:O${r1}`);
   ws1.getCell(`I${r1}`).value = sign.namaMengajukan || '( ..................................... )';
-  ws1.getCell(`I${r1}`).font = { name: FONT, bold: true, size: 10, underline: true };
+  ws1.getCell(`I${r1}`).font = { name: FONT, bold: true, size: 12, underline: true };
   r1 += 1;
   ws1.mergeCells(`B${r1}:D${r1}`);
   ws1.getCell(`B${r1}`).value = sign.jabatanMenyetujui || '';
   ws1.mergeCells(`I${r1}:O${r1}`);
   ws1.getCell(`I${r1}`).value = sign.jabatanMengajukan || '';
-  [`B${r1}`, `I${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 10 }));
+  [`B${r1}`, `I${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 12 }));
 
   // =========================================================
-  // SHEET 2: Rekap Hal. 2 - hasil penilaian (biru/hijau/navy)
+  // SHEET 2: Rekap Hal. 2
   // =========================================================
   const ws2 = workbook.addWorksheet('Rekap Hal. 2');
   ws2.mergeCells('A1:P1');
   ws2.getCell('A1').value = 'EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT';
-  ws2.getCell('A1').font = { name: FONT, bold: true, size: 14 };
+  ws2.getCell('A1').font = { name: FONT, bold: true, size: FONT_SIZE };
   ws2.getCell('A1').alignment = { horizontal: 'center' };
 
   ws2.mergeCells('A2:P2');
   ws2.getCell('A2').value = title.toUpperCase();
-  ws2.getCell('A2').font = { name: FONT, bold: true, size: 12 };
+  ws2.getCell('A2').font = { name: FONT, bold: true, size: FONT_SIZE };
   ws2.getCell('A2').alignment = { horizontal: 'center' };
 
   const h2Simple: [string, string][] = [
     ['A', 'No'], ['B', 'Nama'], ['C', 'Jabatan/Posisi'], ['D', 'Unit Kerja'], ['E', 'Usia'],
-    ['F', 'Masa Kerja dari\nkontrak I (th)'], ['G', 'Periode Akhir\nKontrak'],
+    ['F', 'Masa Kerja dari kontrak I (th)'], ['G', 'Periode Akhir Kontrak'],
   ];
   h2Simple.forEach(([col, label]) => {
     ws2.mergeCells(`${col}4:${col}6`);
@@ -204,43 +215,47 @@ export async function POST(request: Request) {
   });
 
   ws2.mergeCells('H4:O4');
-  styleHeaderCell(ws2.getCell('H4'), greenFill);
+  styleHeaderCell(ws2.getCell('H4'), brightGreenFill);
   ws2.getCell('H4').value = 'Penilaian Evaluasi PKWT';
 
   ws2.mergeCells('H5:H6');
-  styleHeaderCell(ws2.getCell('H5'), greenFill);
+  styleHeaderCell(ws2.getCell('H5'), paleGreenFill);
   ws2.getCell('H5').value = 'Total Nilai';
   ws2.mergeCells('I5:I6');
-  styleHeaderCell(ws2.getCell('I5'), greenFill);
+  styleHeaderCell(ws2.getCell('I5'), paleGreenFill);
   ws2.getCell('I5').value = 'Rata-Rata Nilai';
   ws2.mergeCells('J5:L5');
-  styleHeaderCell(ws2.getCell('J5'), greenFill);
+  styleHeaderCell(ws2.getCell('J5'), paleGreenFill);
   ws2.getCell('J5').value = 'Pengembangan, Potensi & Kinerja';
   ['J', 'K', 'L'].forEach((col, idx) => {
     const cell = ws2.getCell(`${col}6`);
     cell.value = ['Kinerja Karyawan', 'Potensi Karyawan', 'Pengembangan Karyawan'][idx];
-    styleHeaderCell(cell, amberFill);
+    styleHeaderCell(cell, paleGoldFill);
   });
 
   ws2.mergeCells('M5:M6');
-  styleHeaderCell(ws2.getCell('M5'), greenFill);
+  styleHeaderCell(ws2.getCell('M5'), paleGreenFill);
   ws2.getCell('M5').value = 'Catatan Kasus';
   ws2.mergeCells('N5:N6');
-  styleHeaderCell(ws2.getCell('N5'), greenFill);
+  styleHeaderCell(ws2.getCell('N5'), paleGreenFill);
   ws2.getCell('N5').value = 'Kesan-kesan Umum';
   ws2.mergeCells('O5:O6');
-  styleHeaderCell(ws2.getCell('O5'), greenFill);
+  styleHeaderCell(ws2.getCell('O5'), paleGreenFill);
   ws2.getCell('O5').value = 'Saran & Pengembangan';
 
   ws2.mergeCells('P4:P6');
-  styleHeaderCell(ws2.getCell('P4'), navyFill, true);
+  styleHeaderCell(ws2.getCell('P4'), darkBlueFill, true);
   ws2.getCell('P4').value = 'Penilai';
 
-  const widths2: Record<string, number> = { A: 4, B: 20, C: 30, D: 20, E: 7, F: 12, G: 12, H: 9, I: 10, J: 12, K: 12, L: 14, M: 16, N: 32, O: 32, P: 18 };
+  // Lebar kolom persis dari file asli (kolom Gaji & Kontrak Ke sengaja
+  // tidak dimasukkan, sesuai keputusan sebelumnya)
+  const widths2: Record<string, number> = { A: 7.4, B: 28.4, C: 64.6, D: 22.4, E: 19.7, F: 24.4, G: 23.4, H: 21.4, I: 17.4, J: 22.6, K: 22.6, L: 23.3, M: 29.3, N: 80.6, O: 58.7, P: 30 };
   Object.entries(widths2).forEach(([col, w]) => (ws2.getColumn(col).width = w));
-  ws2.getRow(4).height = 20;
-  ws2.getRow(5).height = 22;
-  ws2.getRow(6).height = 16;
+  ws2.getRow(1).height = 24;
+  ws2.getRow(2).height = 24;
+  ws2.getRow(4).height = 40;
+  ws2.getRow(5).height = 36;
+  ws2.getRow(6).height = 58;
 
   let r2 = 7;
   rows.forEach((row: any, i: number) => {
@@ -253,9 +268,8 @@ export async function POST(request: Request) {
       D: emp?.divisi ?? '',
       E: ageYearsOnly(emp?.tgl_lahir),
       F: emp?.masa_kerja ?? '',
-      G: emp?.tgl_habis_kontrak ?? '',
-      H: fmtInt(total),
-      I: fmtDec(row.grand_avg ?? 0),
+      H: total,
+      I: Number((row.grand_avg ?? 0).toFixed(2)),
       J: row.form_c_data?.kinerja ?? '',
       K: row.form_c_data?.potensi ?? '',
       L: row.form_c_data?.pengembangan ?? '',
@@ -265,24 +279,26 @@ export async function POST(request: Request) {
       P: row.assignment?.evaluator?.name ?? '',
     };
     Object.entries(values).forEach(([col, val]) => {
-      const cell = ws2.getCell(`${col}${r2}`);
-      cell.value = val;
-      cell.font = { name: FONT, size: 9 };
-      cell.alignment = ['B', 'C', 'D', 'M', 'N', 'O'].includes(col) ? wrapLeft : wrapCenter;
-      cell.border = allBorders;
+      styleDataCell(ws2.getCell(`${col}${r2}`), ['B', 'C', 'D', 'M', 'N', 'O'].includes(col) ? wrapLeft : wrapCenter);
+      ws2.getCell(`${col}${r2}`).value = val;
     });
-    ws2.getRow(r2).height = 55;
+    if (emp?.tgl_habis_kontrak) {
+      const gCell = ws2.getCell(`G${r2}`);
+      gCell.value = new Date(emp.tgl_habis_kontrak);
+      gCell.numFmt = 'dd mmm yyyy';
+      gCell.border = allBorders;
+      gCell.font = { name: FONT, size: FONT_SIZE };
+      gCell.alignment = wrapCenter;
+    }
+    ws2.getCell(`H${r2}`).numFmt = '#,##0';
+    ws2.getCell(`I${r2}`).numFmt = '#,##0.00';
+    ws2.getRow(r2).height = 140;
     r2++;
   });
 
   [ws1, ws2].forEach((ws) => {
     ws.pageSetup.orientation = 'landscape';
-    // Kolom sengaja dibuat lega untuk dilihat di Excel (tidak wrap
-    // berlebihan). Supaya tetap rapi kalau di-print/export-PDF dari
-    // Excel, dipakai SKALA cetak (bukan fitToWidth) — jadi tabelnya
-    // tetap utuh menyamping tanpa mengubah lebar kolom yang dilihat.
     ws.pageSetup.fitToPage = false;
-    ws.pageSetup.scale = 55;
   });
 
   const buffer = await workbook.xlsx.writeBuffer();
