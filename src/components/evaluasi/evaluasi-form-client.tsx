@@ -539,7 +539,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
             <div className="border border-gray-200 rounded-lg p-4">
               <label className="flex items-center gap-2 text-sm font-semibold text-gray-800 mb-3 cursor-pointer">
                 <input type="checkbox" disabled={readOnly} checked={sig.needBod1} onChange={(e) => setSig((s) => ({ ...s, needBod1: e.target.checked }))} className="w-4 h-4" />
-                Perlu tanda tangan Atasan (BOD 1)?
+                Perlu "Disetujui oleh" (BOD 1)?
               </label>
               {sig.needBod1 ? (
                 <>
@@ -564,7 +564,7 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
             </div>
 
             <div className="border border-gray-200 rounded-lg p-4">
-              <div className="text-xs text-gray-500 mb-2">Tanda Tangan Penilai (wajib)</div>
+              <div className="text-xs text-gray-500 mb-2">"Diisi oleh" — Tanda Tangan Penilai (wajib)</div>
               <input
                 disabled={readOnly}
                 value={sig.penilaiNama}
@@ -584,38 +584,39 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
         </div>
 
         <div className="hidden print:block mt-8 text-xs">
-          <div className="mb-8 text-right">{sig.tempatTanggal || '.....................'}</div>
           {sig.needBod1 ? (
-            <div className="flex justify-between">
+            <div className="flex justify-between items-start">
               <div className="w-[48%] text-center">
                 <div>&nbsp;</div>
+                <div>Disetujui oleh,</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
-                  <div className="font-bold">{sig.bod1Nama || '( ..................................... )'}</div>
+                  <div className="font-bold underline">{sig.bod1Nama || '( ..................................... )'}</div>
                   <div>{sig.bod1Jabatan}</div>
                 </div>
-                <div className="text-[9px] mt-1 italic">(Tanda Tangan Atasan / BOD 1)</div>
               </div>
               <div className="w-[48%] text-center">
-                <div>{emp.divisi}</div>
+                <div>{sig.tempatTanggal || '.....................'}</div>
+                <div>PT Hutama Karya (Persero)</div>
+                <div>Diisi oleh,</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
-                  <div className="font-bold">{sig.penilaiNama || '( ..................................... )'}</div>
+                  <div className="font-bold underline">{sig.penilaiNama || '( ..................................... )'}</div>
                   <div>{sig.penilaiJabatan}</div>
                 </div>
-                <div className="text-[9px] mt-1 italic">(Tanda Tangan Penilai)</div>
               </div>
             </div>
           ) : (
             <div className="flex justify-end">
               <div className="w-[48%] text-center">
-                <div>{emp.divisi}</div>
+                <div>{sig.tempatTanggal || '.....................'}</div>
+                <div>PT Hutama Karya (Persero)</div>
+                <div>Diisi oleh,</div>
                 <div className="h-14"></div>
                 <div className="border-t border-black pt-1">
-                  <div className="font-bold">{sig.penilaiNama || '( ..................................... )'}</div>
+                  <div className="font-bold underline">{sig.penilaiNama || '( ..................................... )'}</div>
                   <div>{sig.penilaiJabatan}</div>
                 </div>
-                <div className="text-[9px] mt-1 italic">(Tanda Tangan Penilai)</div>
               </div>
             </div>
           )}
