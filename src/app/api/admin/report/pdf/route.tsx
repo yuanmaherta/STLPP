@@ -28,16 +28,21 @@ const fmtDec = (n: number) => n.toLocaleString('id-ID', { minimumFractionDigits:
 
 function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
   const editMap = new Map(edits.map((e) => [e.id, e]));
+  // Lebar total harus pas 100%. EVP HC lebih lebar dari DHCL karena isinya
+  // teks status ("Lulus Evaluasi..."), sedangkan DHCL cuma checkbox singkat.
   const simpleCols = [
-    { key: 'no', label: 'No', width: '2.5%' },
-    { key: 'nama', label: 'Nama', width: '9%' },
-    { key: 'jabatan', label: 'Jabatan/Posisi', width: '12%' },
-    { key: 'divisi', label: 'Unit Kerja', width: '9%' },
-    { key: 'usia', label: 'Usia', width: '4%' },
-    { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '7%' },
-    { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '7%' },
+    { key: 'no', label: 'No', width: '2%' },
+    { key: 'nama', label: 'Nama', width: '8%' },
+    { key: 'jabatan', label: 'Jabatan/Posisi', width: '11%' },
+    { key: 'divisi', label: 'Unit Kerja', width: '8%' },
+    { key: 'usia', label: 'Usia', width: '3.5%' },
+    { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '6%' },
+    { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '6%' },
   ];
-  const matrixWidth = '5.5%';
+  const evpWidth = '7%';
+  const dhclWidth = '4%';
+  const ketRekoWidth = '16%';
+  const keteranganWidth = '6.5%';
 
   return (
     <View style={styles.table}>
@@ -47,8 +52,8 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
           <Text key={c.key} style={{ ...styles.headerCellGray, width: c.width as any }} />
         ))}
         <Text style={{ ...styles.headerCellGray, width: '33%' as any }}>Keberlanjutan Kontrak Kerja</Text>
-        <Text style={{ ...styles.headerCellGray, width: '20%' as any }} />
-        <Text style={{ ...styles.headerCellGray, width: '8%' as any }} />
+        <Text style={{ ...styles.headerCellGray, width: ketRekoWidth as any }} />
+        <Text style={{ ...styles.headerCellGray, width: keteranganWidth as any }} />
       </View>
       {/* Header row 2 */}
       <View style={styles.row}>
@@ -60,8 +65,8 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
         <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Tidak dilakukan perpanjangan kontrak</Text>
         <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Dilakukan perpanjangan kontrak selama 6 Bulan</Text>
         <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Dilakukan perpanjangan kontrak selama 1 Tahun</Text>
-        <Text style={{ ...styles.headerCellGray, width: '20%' as any }}>Keterangan Rekomendasi</Text>
-        <Text style={{ ...styles.headerCellGray, width: '8%' as any }}>Keterangan</Text>
+        <Text style={{ ...styles.headerCellGray, width: ketRekoWidth as any }}>Keterangan Rekomendasi</Text>
+        <Text style={{ ...styles.headerCellGray, width: keteranganWidth as any }}>Keterangan</Text>
       </View>
       {/* Header row 3 - EVP HC / DHCL */}
       <View style={styles.row}>
@@ -70,12 +75,12 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
         ))}
         {[0, 1, 2].map((i) => (
           <React.Fragment key={i}>
-            <Text style={{ ...styles.headerCellGray, width: matrixWidth as any }}>EVP HC</Text>
-            <Text style={{ ...styles.headerCellGray, width: matrixWidth as any }}>DHCL</Text>
+            <Text style={{ ...styles.headerCellGray, width: evpWidth as any }}>EVP HC</Text>
+            <Text style={{ ...styles.headerCellGray, width: dhclWidth as any }}>DHCL</Text>
           </React.Fragment>
         ))}
-        <Text style={{ ...styles.headerCellGray, width: '20%' as any }} />
-        <Text style={{ ...styles.headerCellGray, width: '8%' as any }} />
+        <Text style={{ ...styles.headerCellGray, width: ketRekoWidth as any }} />
+        <Text style={{ ...styles.headerCellGray, width: keteranganWidth as any }} />
       </View>
 
       {rows.map((r, i) => {
@@ -97,14 +102,14 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
             <Text style={{ ...styles.dataCellGreen, width: simpleCols[6].width as any }}>{emp?.tgl_habis_kontrak ?? ''}</Text>
             {[0, 1, 2].map((g) => (
               <React.Fragment key={g}>
-                <Text style={{ ...styles.dataCellGreen, width: matrixWidth as any, fontWeight: g === groupIdx ? 700 : 400 }}>
+                <Text style={{ ...styles.dataCellGreen, width: evpWidth as any, fontWeight: g === groupIdx ? 700 : 400 }}>
                   {g === groupIdx ? statusText : ''}
                 </Text>
-                <Text style={{ ...styles.dataCellGreen, width: matrixWidth as any }}>{g === groupIdx ? checkboxText : ''}</Text>
+                <Text style={{ ...styles.dataCellGreen, width: dhclWidth as any }}>{g === groupIdx ? checkboxText : ''}</Text>
               </React.Fragment>
             ))}
-            <Text style={{ ...styles.dataCellGreen, width: '20%' as any }}>{orDash(edit.keteranganRekomendasi)}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: '8%' as any }}>{orDash(edit.keterangan)}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: ketRekoWidth as any }}>{orDash(edit.keteranganRekomendasi)}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: keteranganWidth as any }}>{orDash(edit.keterangan)}</Text>
           </View>
         );
       })}
@@ -113,22 +118,22 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
 }
 
 const COLS_2 = [
-  { key: 'no', label: 'No', width: '3%', style: 'blue' },
-  { key: 'nama', label: 'Nama', width: '11%', style: 'blue' },
-  { key: 'jabatan', label: 'Jabatan/Posisi', width: '13%', style: 'blue' },
-  { key: 'divisi', label: 'Unit Kerja', width: '11%', style: 'blue' },
-  { key: 'usia', label: 'Usia', width: '5%', style: 'blue' },
-  { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '8%', style: 'blue' },
-  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '7%', style: 'blue' },
-  { key: 'total', label: 'Total Nilai', width: '5%', style: 'green' },
-  { key: 'rata', label: 'Rata-Rata Nilai', width: '5%', style: 'green' },
-  { key: 'kinerja', label: 'Kinerja Karyawan', width: '6%', style: 'amber' },
-  { key: 'potensi', label: 'Potensi Karyawan', width: '6%', style: 'amber' },
-  { key: 'pengembangan', label: 'Pengembangan Karyawan', width: '7%', style: 'amber' },
-  { key: 'catatan', label: 'Catatan Kasus', width: '7%', style: 'green' },
-  { key: 'kesan', label: 'Kesan-kesan Umum', width: '11%', style: 'green' },
-  { key: 'saran', label: 'Saran & Pengembangan', width: '9%', style: 'green' },
-  { key: 'penilai', label: 'Penilai', width: '6%', style: 'navy' },
+  { key: 'no', label: 'No', width: '2%', style: 'blue' },
+  { key: 'nama', label: 'Nama', width: '8%', style: 'blue' },
+  { key: 'jabatan', label: 'Jabatan/Posisi', width: '10%', style: 'blue' },
+  { key: 'divisi', label: 'Unit Kerja', width: '8%', style: 'blue' },
+  { key: 'usia', label: 'Usia', width: '3.5%', style: 'blue' },
+  { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '6%', style: 'blue' },
+  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '5.5%', style: 'blue' },
+  { key: 'total', label: 'Total Nilai', width: '4.5%', style: 'green' },
+  { key: 'rata', label: 'Rata-Rata Nilai', width: '4.5%', style: 'green' },
+  { key: 'kinerja', label: 'Kinerja Karyawan', width: '5%', style: 'amber' },
+  { key: 'potensi', label: 'Potensi Karyawan', width: '5%', style: 'amber' },
+  { key: 'pengembangan', label: 'Pengembangan Karyawan', width: '6%', style: 'amber' },
+  { key: 'catatan', label: 'Catatan Kasus', width: '5%', style: 'green' },
+  { key: 'kesan', label: 'Kesan-kesan Umum', width: '12%', style: 'green' },
+  { key: 'saran', label: 'Saran & Pengembangan', width: '10%', style: 'green' },
+  { key: 'penilai', label: 'Penilai', width: '5%', style: 'navy' },
 ];
 
 function headerStyleFor(kind: string) {

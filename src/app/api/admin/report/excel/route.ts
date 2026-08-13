@@ -99,7 +99,7 @@ export async function POST(request: Request) {
   styleHeaderCell(ws1.getCell('O4'), grayFill);
   ws1.getCell('O4').value = 'Keterangan';
 
-  const widths1: Record<string, number> = { A: 5, B: 20, C: 26, D: 20, E: 9, F: 12, G: 13, H: 9, I: 9, J: 9, K: 9, L: 9, M: 9, N: 32, O: 14 };
+  const widths1: Record<string, number> = { A: 4, B: 18, C: 26, D: 18, E: 7, F: 11, G: 11, H: 20, I: 12, J: 20, K: 12, L: 20, M: 12, N: 32, O: 12 };
   Object.entries(widths1).forEach(([col, w]) => (ws1.getColumn(col).width = w));
   ws1.getRow(4).height = 20;
   ws1.getRow(5).height = 30;
@@ -150,7 +150,7 @@ export async function POST(request: Request) {
     ws1.getCell(`${evpCol}${r1}`).font = { name: FONT, bold: true, size: 9 };
     ws1.getCell(`${dhclCol}${r1}`).value = checkboxText;
 
-    ws1.getRow(r1).height = 90;
+    ws1.getRow(r1).height = 75;
     r1++;
   });
 
@@ -236,7 +236,7 @@ export async function POST(request: Request) {
   styleHeaderCell(ws2.getCell('P4'), navyFill, true);
   ws2.getCell('P4').value = 'Penilai';
 
-  const widths2: Record<string, number> = { A: 5, B: 20, C: 24, D: 18, E: 9, F: 12, G: 13, H: 9, I: 10, J: 12, K: 12, L: 14, M: 18, N: 26, O: 26, P: 18 };
+  const widths2: Record<string, number> = { A: 4, B: 20, C: 30, D: 20, E: 7, F: 12, G: 12, H: 9, I: 10, J: 12, K: 12, L: 14, M: 16, N: 32, O: 32, P: 18 };
   Object.entries(widths2).forEach(([col, w]) => (ws2.getColumn(col).width = w));
   ws2.getRow(4).height = 20;
   ws2.getRow(5).height = 22;
@@ -271,15 +271,18 @@ export async function POST(request: Request) {
       cell.alignment = ['B', 'C', 'D', 'M', 'N', 'O'].includes(col) ? wrapLeft : wrapCenter;
       cell.border = allBorders;
     });
-    ws2.getRow(r2).height = 45;
+    ws2.getRow(r2).height = 55;
     r2++;
   });
 
   [ws1, ws2].forEach((ws) => {
     ws.pageSetup.orientation = 'landscape';
-    ws.pageSetup.fitToPage = true;
-    ws.pageSetup.fitToWidth = 1;
-    ws.pageSetup.fitToHeight = 0;
+    // Kolom sengaja dibuat lega untuk dilihat di Excel (tidak wrap
+    // berlebihan). Supaya tetap rapi kalau di-print/export-PDF dari
+    // Excel, dipakai SKALA cetak (bukan fitToWidth) — jadi tabelnya
+    // tetap utuh menyamping tanpa mengubah lebar kolom yang dilihat.
+    ws.pageSetup.fitToPage = false;
+    ws.pageSetup.scale = 55;
   });
 
   const buffer = await workbook.xlsx.writeBuffer();
