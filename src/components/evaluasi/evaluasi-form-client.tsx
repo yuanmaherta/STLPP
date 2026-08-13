@@ -20,6 +20,38 @@ import type { FormGroup, FormItem, IndicatorScoreMap, FormCData } from '@/types'
 
 const { formAItemIds, formBItemIds } = getAllFormItemIds(DEFAULT_FORM_STRUCTURE);
 
+const BULAN_ID = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+];
+
+function formatTanggalID(dateStr?: string | null): string {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${dd}-${BULAN_ID[d.getMonth()]}-${d.getFullYear()}`;
+}
+
+function hitungUsia(dateStr?: string | null): string {
+  if (!dateStr) return '-';
+  const birth = new Date(dateStr);
+  if (isNaN(birth.getTime())) return '-';
+  const now = new Date();
+  let years = now.getFullYear() - birth.getFullYear();
+  let months = now.getMonth() - birth.getMonth();
+  let days = now.getDate() - birth.getDate();
+  if (days < 0) {
+    months -= 1;
+    days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+  return `${years} Tahun ${months} Bulan ${days} Hari`;
+}
+
 interface EmployeeInfo {
   id: string;
   nik: string;
@@ -444,7 +476,8 @@ export function EvaluasiFormClient({ assignment, existingEvaluation, evaluatorNa
             {[
               ['Nama Karyawan', emp.nama],
               ['NIK', emp.nik],
-              ['Tanggal Lahir', emp.tgl_lahir ?? '-'],
+              ['Tanggal Lahir', formatTanggalID(emp.tgl_lahir)],
+              ['Usia', hitungUsia(emp.tgl_lahir)],
               ['Jabatan', emp.jabatan],
               ['Divisi', emp.divisi],
               ['Bagian', emp.bagian ?? '-'],
