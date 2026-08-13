@@ -5,15 +5,18 @@ import { createClient } from '@/lib/supabase/server';
 import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
 
 const styles = StyleSheet.create({
-  page: { padding: 20, fontSize: 7, fontFamily: 'Helvetica' },
+  page: { padding: 18, fontSize: 6.5, fontFamily: 'Helvetica' },
   title: { fontSize: 12, fontWeight: 700, textAlign: 'center', marginBottom: 2 },
   subtitle: { fontSize: 10, fontWeight: 700, textAlign: 'center', marginBottom: 10 },
-  sectionGap: { marginTop: 16 },
   table: { display: 'flex', width: 'auto', borderStyle: 'solid', borderWidth: 1, borderColor: '#000' },
   row: { flexDirection: 'row' },
-  headerRow: { flexDirection: 'row', backgroundColor: '#dbeafe' },
   cell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3 },
-  headerCell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700 },
+  headerCellGray: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#D9D9D9' },
+  headerCellBlue: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#BDD7EE' },
+  headerCellGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#C6E0B4' },
+  headerCellAmber: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#FFE699' },
+  headerCellNavy: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#1F3864', color: '#FFFFFF' },
+  dataCellGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, backgroundColor: '#E2EFDA' },
   signRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 },
   signBlock: { width: '40%', textAlign: 'center' },
   signName: { fontWeight: 700, textDecoration: 'underline', marginTop: 30 },
@@ -23,104 +26,169 @@ const orDash = (v?: string | null) => (v && v.trim() ? v : '-');
 const fmtInt = (n: number) => n.toLocaleString('id-ID');
 const fmtDec = (n: number) => n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-const COLS_1 = [
-  { key: 'no', label: 'No', width: '3%' },
-  { key: 'nama', label: 'Nama', width: '11%' },
-  { key: 'jabatan', label: 'Jabatan/Posisi', width: '15%' },
-  { key: 'divisi', label: 'Unit Kerja', width: '11%' },
-  { key: 'usia', label: 'Usia', width: '5%' },
-  { key: 'masaKerja', label: 'Masa Kerja', width: '8%' },
-  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '9%' },
-  { key: 'keberlanjutan', label: 'Keberlanjutan Kontrak Kerja', width: '16%' },
-  { key: 'ketReko', label: 'Keterangan Rekomendasi', width: '15%' },
-  { key: 'keterangan', label: 'Keterangan', width: '7%' },
-];
+function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
+  const editMap = new Map(edits.map((e) => [e.id, e]));
+  const simpleCols = [
+    { key: 'no', label: 'No', width: '2.5%' },
+    { key: 'nama', label: 'Nama', width: '9%' },
+    { key: 'jabatan', label: 'Jabatan/Posisi', width: '12%' },
+    { key: 'divisi', label: 'Unit Kerja', width: '9%' },
+    { key: 'usia', label: 'Usia', width: '4%' },
+    { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '7%' },
+    { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '7%' },
+  ];
+  const matrixWidth = '5.5%';
 
-const COLS_2 = [
-  { key: 'no', label: 'No', width: '3%' },
-  { key: 'nama', label: 'Nama', width: '11%' },
-  { key: 'jabatan', label: 'Jabatan/Posisi', width: '13%' },
-  { key: 'divisi', label: 'Unit Kerja', width: '11%' },
-  { key: 'usia', label: 'Usia', width: '5%' },
-  { key: 'total', label: 'Total Nilai', width: '6%' },
-  { key: 'rata', label: 'Rata-Rata', width: '6%' },
-  { key: 'kinerja', label: 'Kinerja', width: '6%' },
-  { key: 'potensi', label: 'Potensi', width: '6%' },
-  { key: 'pengembangan', label: 'Pengembangan', width: '7%' },
-  { key: 'kesan', label: 'Kesan-kesan Umum', width: '12%' },
-  { key: 'saran', label: 'Saran & Pengembangan', width: '9%' },
-  { key: 'penilai', label: 'Penilai', width: '5%' },
-];
-
-function ReportTable({ cols, rows }: { cols: typeof COLS_1; rows: Record<string, string>[] }) {
   return (
     <View style={styles.table}>
-      <View style={styles.headerRow}>
-        {cols.map((c) => (
-          <Text key={c.key} style={{ ...styles.headerCell, width: c.width as any }}>
+      {/* Header row 1 */}
+      <View style={styles.row}>
+        {simpleCols.map((c) => (
+          <Text key={c.key} style={{ ...styles.headerCellGray, width: c.width as any }} />
+        ))}
+        <Text style={{ ...styles.headerCellGray, width: '33%' as any }}>Keberlanjutan Kontrak Kerja</Text>
+        <Text style={{ ...styles.headerCellGray, width: '20%' as any }} />
+        <Text style={{ ...styles.headerCellGray, width: '8%' as any }} />
+      </View>
+      {/* Header row 2 */}
+      <View style={styles.row}>
+        {simpleCols.map((c) => (
+          <Text key={c.key} style={{ ...styles.headerCellGray, width: c.width as any }}>
+            {c.label}
+          </Text>
+        ))}
+        <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Tidak dilakukan perpanjangan kontrak</Text>
+        <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Dilakukan perpanjangan kontrak selama 6 Bulan</Text>
+        <Text style={{ ...styles.headerCellGray, width: '11%' as any }}>Dilakukan perpanjangan kontrak selama 1 Tahun</Text>
+        <Text style={{ ...styles.headerCellGray, width: '20%' as any }}>Keterangan Rekomendasi</Text>
+        <Text style={{ ...styles.headerCellGray, width: '8%' as any }}>Keterangan</Text>
+      </View>
+      {/* Header row 3 - EVP HC / DHCL */}
+      <View style={styles.row}>
+        {simpleCols.map((c) => (
+          <Text key={c.key} style={{ ...styles.headerCellGray, width: c.width as any }} />
+        ))}
+        {[0, 1, 2].map((i) => (
+          <React.Fragment key={i}>
+            <Text style={{ ...styles.headerCellGray, width: matrixWidth as any }}>EVP HC</Text>
+            <Text style={{ ...styles.headerCellGray, width: matrixWidth as any }}>DHCL</Text>
+          </React.Fragment>
+        ))}
+        <Text style={{ ...styles.headerCellGray, width: '20%' as any }} />
+        <Text style={{ ...styles.headerCellGray, width: '8%' as any }} />
+      </View>
+
+      {rows.map((r, i) => {
+        const emp = r.assignment?.employee;
+        const edit = editMap.get(r.id) ?? {};
+        const lulus = r.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
+        const statusText = `${lulus}\n\n${edit.rekomendasi ?? ''}`;
+        const checkboxText = '[ ] Disetujui\n[ ] Tidak Disetujui';
+        const groupIdx = r.recommendation !== 'DI PERPANJANG' ? 0 : r.duration === '6' ? 1 : 2;
+
+        return (
+          <View key={i} style={styles.row}>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[0].width as any }}>{i + 1}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[1].width as any }}>{emp?.nama ?? ''}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[2].width as any }}>{emp?.jabatan ?? ''}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[3].width as any }}>{emp?.divisi ?? ''}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[4].width as any }}>{ageYearsOnly(emp?.tgl_lahir)}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[5].width as any }}>{emp?.masa_kerja ?? ''}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: simpleCols[6].width as any }}>{emp?.tgl_habis_kontrak ?? ''}</Text>
+            {[0, 1, 2].map((g) => (
+              <React.Fragment key={g}>
+                <Text style={{ ...styles.dataCellGreen, width: matrixWidth as any, fontWeight: g === groupIdx ? 700 : 400 }}>
+                  {g === groupIdx ? statusText : ''}
+                </Text>
+                <Text style={{ ...styles.dataCellGreen, width: matrixWidth as any }}>{g === groupIdx ? checkboxText : ''}</Text>
+              </React.Fragment>
+            ))}
+            <Text style={{ ...styles.dataCellGreen, width: '20%' as any }}>{orDash(edit.keteranganRekomendasi)}</Text>
+            <Text style={{ ...styles.dataCellGreen, width: '8%' as any }}>{orDash(edit.keterangan)}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const COLS_2 = [
+  { key: 'no', label: 'No', width: '3%', style: 'blue' },
+  { key: 'nama', label: 'Nama', width: '11%', style: 'blue' },
+  { key: 'jabatan', label: 'Jabatan/Posisi', width: '13%', style: 'blue' },
+  { key: 'divisi', label: 'Unit Kerja', width: '11%', style: 'blue' },
+  { key: 'usia', label: 'Usia', width: '5%', style: 'blue' },
+  { key: 'masaKerja', label: 'Masa Kerja dari kontrak I (th)', width: '8%', style: 'blue' },
+  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '7%', style: 'blue' },
+  { key: 'total', label: 'Total Nilai', width: '5%', style: 'green' },
+  { key: 'rata', label: 'Rata-Rata Nilai', width: '5%', style: 'green' },
+  { key: 'kinerja', label: 'Kinerja Karyawan', width: '6%', style: 'amber' },
+  { key: 'potensi', label: 'Potensi Karyawan', width: '6%', style: 'amber' },
+  { key: 'pengembangan', label: 'Pengembangan Karyawan', width: '7%', style: 'amber' },
+  { key: 'catatan', label: 'Catatan Kasus', width: '7%', style: 'green' },
+  { key: 'kesan', label: 'Kesan-kesan Umum', width: '11%', style: 'green' },
+  { key: 'saran', label: 'Saran & Pengembangan', width: '9%', style: 'green' },
+  { key: 'penilai', label: 'Penilai', width: '6%', style: 'navy' },
+];
+
+function headerStyleFor(kind: string) {
+  if (kind === 'green') return styles.headerCellGreen;
+  if (kind === 'amber') return styles.headerCellAmber;
+  if (kind === 'navy') return styles.headerCellNavy;
+  return styles.headerCellBlue;
+}
+
+function Table2({ rows }: { rows: any[] }) {
+  return (
+    <View style={styles.table}>
+      <View style={styles.row}>
+        {COLS_2.map((c) => (
+          <Text key={c.key} style={{ ...headerStyleFor(c.style), width: c.width as any }}>
             {c.label}
           </Text>
         ))}
       </View>
-      {rows.map((r, i) => (
-        <View key={i} style={styles.row}>
-          {cols.map((c) => (
-            <Text key={c.key} style={{ ...styles.cell, width: c.width as any }}>
-              {r[c.key] ?? ''}
-            </Text>
-          ))}
-        </View>
-      ))}
+      {rows.map((r, i) => {
+        const emp = r.assignment?.employee;
+        const values: Record<string, string> = {
+          no: String(i + 1),
+          nama: emp?.nama ?? '',
+          jabatan: emp?.jabatan ?? '',
+          divisi: emp?.divisi ?? '',
+          usia: ageYearsOnly(emp?.tgl_lahir),
+          masaKerja: emp?.masa_kerja ?? '',
+          periodeAkhir: emp?.tgl_habis_kontrak ?? '',
+          total: fmtInt(sumScores(r.scores)),
+          rata: fmtDec(r.grand_avg ?? 0),
+          kinerja: r.form_c_data?.kinerja ?? '',
+          potensi: r.form_c_data?.potensi ?? '',
+          pengembangan: r.form_c_data?.pengembangan ?? '',
+          catatan: orDash(r.form_c_data?.catatanKasus),
+          kesan: orDash(r.form_c_data?.kesanUmum),
+          saran: orDash(r.form_c_data?.saranPengembangan),
+          penilai: r.assignment?.evaluator?.name ?? '',
+        };
+        return (
+          <View key={i} style={styles.row}>
+            {COLS_2.map((c) => (
+              <Text key={c.key} style={{ ...styles.cell, width: c.width as any }}>
+                {values[c.key]}
+              </Text>
+            ))}
+          </View>
+        );
+      })}
     </View>
   );
 }
 
 function ReportDocument({ rows, edits, title, sign }: { rows: any[]; edits: any[]; title: string; sign: any }) {
-  const editMap = new Map(edits.map((e) => [e.id, e]));
-
-  const rows1 = rows.map((r, i) => {
-    const emp = r.assignment?.employee;
-    const edit = editMap.get(r.id) ?? {};
-    const lulus = r.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
-    return {
-      no: String(i + 1),
-      nama: emp?.nama ?? '',
-      jabatan: emp?.jabatan ?? '',
-      divisi: emp?.divisi ?? '',
-      usia: ageYearsOnly(emp?.tgl_lahir),
-      masaKerja: emp?.masa_kerja ?? '',
-      periodeAkhir: emp?.tgl_habis_kontrak ?? '',
-      keberlanjutan: `${lulus}\n${edit.rekomendasi ?? ''}\n\n[ ] Disetujui\n[ ] Tidak Disetujui`,
-      ketReko: orDash(edit.keteranganRekomendasi),
-      keterangan: orDash(edit.keterangan),
-    };
-  });
-
-  const rows2 = rows.map((r, i) => {
-    const emp = r.assignment?.employee;
-    return {
-      no: String(i + 1),
-      nama: emp?.nama ?? '',
-      jabatan: emp?.jabatan ?? '',
-      divisi: emp?.divisi ?? '',
-      usia: ageYearsOnly(emp?.tgl_lahir),
-      total: fmtInt(sumScores(r.scores)),
-      rata: fmtDec(r.grand_avg ?? 0),
-      kinerja: r.form_c_data?.kinerja ?? '',
-      potensi: r.form_c_data?.potensi ?? '',
-      pengembangan: r.form_c_data?.pengembangan ?? '',
-      kesan: orDash(r.form_c_data?.kesanUmum),
-      saran: orDash(r.form_c_data?.saranPengembangan),
-      penilai: r.assignment?.evaluator?.name ?? '',
-    };
-  });
-
   return (
     <Document>
       <Page size="A4" orientation="landscape" style={styles.page}>
         <Text style={styles.title}>EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT</Text>
         <Text style={styles.subtitle}>{title.toUpperCase()}</Text>
-        <ReportTable cols={COLS_1} rows={rows1} />
+        <Table1 rows={rows} edits={edits} />
 
         <View style={styles.signRow}>
           <View style={styles.signBlock}>
@@ -140,7 +208,7 @@ function ReportDocument({ rows, edits, title, sign }: { rows: any[]; edits: any[
       <Page size="A4" orientation="landscape" style={styles.page}>
         <Text style={styles.title}>EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT</Text>
         <Text style={styles.subtitle}>{title.toUpperCase()} — PENILAIAN EVALUASI PKWT</Text>
-        <ReportTable cols={COLS_2} rows={rows2} />
+        <Table2 rows={rows} />
       </Page>
     </Document>
   );
