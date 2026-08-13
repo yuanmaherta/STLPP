@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import { createClient } from '@/lib/supabase/server';
-import { ageYearsOnly, sumScores, durasiLabel } from '@/lib/utils/report-helpers';
+import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
 
 const FONT = 'Arial';
 const blueFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFBDD7EE' } };
 const greenFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6E0B4' } };
 const navyFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F3864' } };
-const yellowFill: ExcelJS.Fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF2CC' } };
 const thin: ExcelJS.Border = { style: 'thin', color: { argb: 'FF000000' } };
 const allBorders = { top: thin, left: thin, bottom: thin, right: thin };
 const wrapCenter: Partial<ExcelJS.Alignment> = { wrapText: true, vertical: 'middle', horizontal: 'center' };
@@ -19,6 +18,10 @@ function styleHeaderCell(cell: ExcelJS.Cell, fill: ExcelJS.Fill, white = false) 
   cell.alignment = wrapCenter;
   cell.border = allBorders;
 }
+
+const fmtInt = (n: number) => n.toLocaleString('id-ID');
+const fmtDec = (n: number) => n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const orDash = (v: string | null | undefined) => (v && v.trim() ? v : '-');
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -36,6 +39,7 @@ export async function POST(request: Request) {
   const rows = (body.rows ?? []) as any[];
   const edits = (body.edits ?? []) as any[];
   const title: string = body.title ?? 'Semua Divisi';
+  const sign = body.sign ?? {};
   const editMap = new Map(edits.map((e) => [e.id, e]));
 
   const workbook = new ExcelJS.Workbook();
@@ -44,60 +48,38 @@ export async function POST(request: Request) {
   // SHEET 1: Rekap Hal. 1 - status kontrak & approval
   // =========================================================
   const ws1 = workbook.addWorksheet('Rekap Hal. 1');
-  ws1.mergeCells('A1:N1');
+  ws1.mergeCells('A1:I1');
   ws1.getCell('A1').value = 'EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT';
   ws1.getCell('A1').font = { name: FONT, bold: true, size: 14 };
   ws1.getCell('A1').alignment = { horizontal: 'center' };
 
-  ws1.mergeCells('A2:N2');
+  ws1.mergeCells('A2:I2');
   ws1.getCell('A2').value = title.toUpperCase();
   ws1.getCell('A2').font = { name: FONT, bold: true, size: 12 };
   ws1.getCell('A2').alignment = { horizontal: 'center' };
 
-  const h1Simple: [string, string][] = [
+  const h1: [string, string][] = [
     ['A', 'No'], ['B', 'Nama'], ['C', 'Jabatan/Posisi'], ['D', 'Unit Kerja'],
     ['E', 'Usia'], ['F', 'Masa Kerja dari\nkontrak I (th)'], ['G', 'Periode Akhir\nKontrak'],
+    ['H', 'Keberlanjutan Kontrak Kerja'], ['I', 'Keterangan Rekomendasi'], ['J', 'Keterangan'],
   ];
-  h1Simple.forEach(([col, label]) => {
-    ws1.mergeCells(`${col}4:${col}6`);
-    styleHeaderCell(ws1.getCell(`${col}4`), blueFill);
+  h1.forEach(([col, label]) => {
+    styleHeaderCell(ws1.getCell(`${col}4`), col === 'I' ? navyFill : col === 'H' ? greenFill : blueFill, col === 'I');
     ws1.getCell(`${col}4`).value = label;
   });
+  ws1.mergeCells('A1:J1');
+  ws1.mergeCells('A2:J2');
 
-  ws1.mergeCells('H4:M4');
-  styleHeaderCell(ws1.getCell('H4'), greenFill);
-  ws1.getCell('H4').value = 'Keberlanjutan Kontrak Kerja';
-
-  const groupLabels: [string, string, string][] = [
-    ['H5', 'I5', 'Tidak dilakukan\nperpanjangan kontrak'],
-    ['J5', 'K5', 'Dilakukan perpanjangan\nkontrak selama 6 Bulan'],
-    ['L5', 'M5', 'Dilakukan perpanjangan\nkontrak selama 1 Tahun'],
-  ];
-  groupLabels.forEach(([start, end, label]) => {
-    ws1.mergeCells(`${start}:${end}`);
-    styleHeaderCell(ws1.getCell(start), greenFill);
-    ws1.getCell(start).value = label;
-  });
-  ['H', 'I', 'J', 'K', 'L', 'M'].forEach((col) => {
-    const cell = ws1.getCell(`${col}6`);
-    cell.value = col === 'H' || col === 'J' || col === 'L' ? 'EVP HC' : 'DHCL';
-    styleHeaderCell(cell, greenFill);
-  });
-
-  ws1.mergeCells('N4:N6');
-  styleHeaderCell(ws1.getCell('N4'), navyFill, true);
-  ws1.getCell('N4').value = 'Keterangan Rekomendasi';
-
-  const widths1: Record<string, number> = { A: 5, B: 20, C: 26, D: 20, E: 9, F: 12, G: 13, H: 8, I: 8, J: 8, K: 8, L: 8, M: 8, N: 36 };
+  const widths1: Record<string, number> = { A: 5, B: 20, C: 26, D: 20, E: 9, F: 12, G: 13, H: 22, I: 30, J: 14 };
   Object.entries(widths1).forEach(([col, w]) => (ws1.getColumn(col).width = w));
-  ws1.getRow(4).height = 24;
-  ws1.getRow(5).height = 40;
-  ws1.getRow(6).height = 16;
+  ws1.getRow(4).height = 30;
 
-  let r1 = 7;
+  let r1 = 5;
   rows.forEach((row: any, i: number) => {
     const emp = row.assignment?.employee;
     const edit = editMap.get(row.id) ?? {};
+    const lulus = row.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
+    const keberlanjutan = `${lulus}\n${edit.rekomendasi ?? ''}\n\n\u2610 Disetujui\n\u2610 Tidak Disetujui`;
     const values: Record<string, any> = {
       A: i + 1,
       B: emp?.nama ?? '',
@@ -106,38 +88,56 @@ export async function POST(request: Request) {
       E: ageYearsOnly(emp?.tgl_lahir),
       F: emp?.masa_kerja ?? '',
       G: emp?.tgl_habis_kontrak ?? '',
-      N: edit.keteranganRekomendasi ?? '',
+      H: keberlanjutan,
+      I: orDash(edit.keteranganRekomendasi),
+      J: orDash(edit.keterangan),
     };
     Object.entries(values).forEach(([col, val]) => {
       const cell = ws1.getCell(`${col}${r1}`);
       cell.value = val;
       cell.font = { name: FONT, size: 9 };
-      cell.alignment = ['B', 'C', 'D', 'N'].includes(col) ? wrapLeft : wrapCenter;
+      cell.alignment = ['B', 'C', 'D', 'H', 'I'].includes(col) ? wrapLeft : wrapCenter;
       cell.border = allBorders;
     });
-    ['H', 'I', 'J', 'K', 'L', 'M'].forEach((col) => {
-      const cell = ws1.getCell(`${col}${r1}`);
-      cell.border = allBorders;
-    });
-    // Tandai kolom EVP HC sesuai rekomendasi (kolom DHCL sengaja dikosongkan untuk tanda tangan manual)
-    const markCol = row.recommendation !== 'DI PERPANJANG' ? 'H' : row.duration === '6' ? 'J' : 'L';
-    ws1.getCell(`${markCol}${r1}`).value = 'V';
-    ws1.getCell(`${markCol}${r1}`).font = { name: FONT, bold: true, size: 10 };
-    ws1.getCell(`${markCol}${r1}`).alignment = wrapCenter;
-    ws1.getRow(r1).height = 45;
+    ws1.getRow(r1).height = 90;
     r1++;
   });
+
+  // Blok tanda tangan Menyetujui / Mengajukan
+  r1 += 2;
+  ws1.mergeCells(`G${r1}:J${r1}`);
+  ws1.getCell(`G${r1}`).value = sign.tempatTanggal || '';
+  ws1.getCell(`G${r1}`).font = { name: FONT, size: 10 };
+  r1 += 2;
+  ws1.mergeCells(`B${r1}:D${r1}`);
+  ws1.getCell(`B${r1}`).value = 'Menyetujui,';
+  ws1.mergeCells(`G${r1}:J${r1}`);
+  ws1.getCell(`G${r1}`).value = 'Mengajukan,';
+  [`B${r1}`, `G${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 10 }));
+  r1 += 4;
+  ws1.mergeCells(`B${r1}:D${r1}`);
+  ws1.getCell(`B${r1}`).value = sign.namaMenyetujui || '( ..................................... )';
+  ws1.getCell(`B${r1}`).font = { name: FONT, bold: true, size: 10, underline: true };
+  ws1.mergeCells(`G${r1}:J${r1}`);
+  ws1.getCell(`G${r1}`).value = sign.namaMengajukan || '( ..................................... )';
+  ws1.getCell(`G${r1}`).font = { name: FONT, bold: true, size: 10, underline: true };
+  r1 += 1;
+  ws1.mergeCells(`B${r1}:D${r1}`);
+  ws1.getCell(`B${r1}`).value = sign.jabatanMenyetujui || '';
+  ws1.mergeCells(`G${r1}:J${r1}`);
+  ws1.getCell(`G${r1}`).value = sign.jabatanMengajukan || '';
+  [`B${r1}`, `G${r1}`].forEach((addr) => (ws1.getCell(addr).font = { name: FONT, size: 10 }));
 
   // =========================================================
   // SHEET 2: Rekap Hal. 2 - hasil penilaian
   // =========================================================
   const ws2 = workbook.addWorksheet('Rekap Hal. 2');
-  ws2.mergeCells('A1:Q1');
+  ws2.mergeCells('A1:P1');
   ws2.getCell('A1').value = 'EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT';
   ws2.getCell('A1').font = { name: FONT, bold: true, size: 14 };
   ws2.getCell('A1').alignment = { horizontal: 'center' };
 
-  ws2.mergeCells('A2:Q2');
+  ws2.mergeCells('A2:P2');
   ws2.getCell('A2').value = title.toUpperCase();
   ws2.getCell('A2').font = { name: FONT, bold: true, size: 12 };
   ws2.getCell('A2').alignment = { horizontal: 'center' };
@@ -203,14 +203,14 @@ export async function POST(request: Request) {
       E: ageYearsOnly(emp?.tgl_lahir),
       F: emp?.masa_kerja ?? '',
       G: emp?.tgl_habis_kontrak ?? '',
-      H: total,
-      I: row.grand_avg,
+      H: fmtInt(total),
+      I: fmtDec(row.grand_avg ?? 0),
       J: row.form_c_data?.kinerja ?? '',
       K: row.form_c_data?.potensi ?? '',
       L: row.form_c_data?.pengembangan ?? '',
-      M: row.form_c_data?.catatanKasus ?? '',
-      N: row.form_c_data?.kesanUmum ?? '',
-      O: row.form_c_data?.saranPengembangan ?? '',
+      M: orDash(row.form_c_data?.catatanKasus),
+      N: orDash(row.form_c_data?.kesanUmum),
+      O: orDash(row.form_c_data?.saranPengembangan),
       P: row.assignment?.evaluator?.name ?? '',
     };
     Object.entries(values).forEach(([col, val]) => {

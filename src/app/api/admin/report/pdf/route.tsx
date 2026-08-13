@@ -14,18 +14,26 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', backgroundColor: '#dbeafe' },
   cell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3 },
   headerCell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700 },
+  signRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 },
+  signBlock: { width: '40%', textAlign: 'center' },
+  signName: { fontWeight: 700, textDecoration: 'underline', marginTop: 30 },
 });
+
+const orDash = (v?: string | null) => (v && v.trim() ? v : '-');
+const fmtInt = (n: number) => n.toLocaleString('id-ID');
+const fmtDec = (n: number) => n.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const COLS_1 = [
   { key: 'no', label: 'No', width: '3%' },
-  { key: 'nama', label: 'Nama', width: '13%' },
-  { key: 'jabatan', label: 'Jabatan/Posisi', width: '16%' },
-  { key: 'divisi', label: 'Unit Kerja', width: '13%' },
-  { key: 'usia', label: 'Usia', width: '6%' },
-  { key: 'masaKerja', label: 'Masa Kerja', width: '9%' },
-  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '10%' },
-  { key: 'rekomendasi', label: 'Keberlanjutan Kontrak Kerja', width: '14%' },
-  { key: 'keterangan', label: 'Keterangan Rekomendasi', width: '16%' },
+  { key: 'nama', label: 'Nama', width: '11%' },
+  { key: 'jabatan', label: 'Jabatan/Posisi', width: '15%' },
+  { key: 'divisi', label: 'Unit Kerja', width: '11%' },
+  { key: 'usia', label: 'Usia', width: '5%' },
+  { key: 'masaKerja', label: 'Masa Kerja', width: '8%' },
+  { key: 'periodeAkhir', label: 'Periode Akhir Kontrak', width: '9%' },
+  { key: 'keberlanjutan', label: 'Keberlanjutan Kontrak Kerja', width: '16%' },
+  { key: 'ketReko', label: 'Keterangan Rekomendasi', width: '15%' },
+  { key: 'keterangan', label: 'Keterangan', width: '7%' },
 ];
 
 const COLS_2 = [
@@ -67,12 +75,13 @@ function ReportTable({ cols, rows }: { cols: typeof COLS_1; rows: Record<string,
   );
 }
 
-function ReportDocument({ rows, edits, title }: { rows: any[]; edits: any[]; title: string }) {
+function ReportDocument({ rows, edits, title, sign }: { rows: any[]; edits: any[]; title: string; sign: any }) {
   const editMap = new Map(edits.map((e) => [e.id, e]));
 
   const rows1 = rows.map((r, i) => {
     const emp = r.assignment?.employee;
     const edit = editMap.get(r.id) ?? {};
+    const lulus = r.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
     return {
       no: String(i + 1),
       nama: emp?.nama ?? '',
@@ -81,8 +90,9 @@ function ReportDocument({ rows, edits, title }: { rows: any[]; edits: any[]; tit
       usia: ageYearsOnly(emp?.tgl_lahir),
       masaKerja: emp?.masa_kerja ?? '',
       periodeAkhir: emp?.tgl_habis_kontrak ?? '',
-      rekomendasi: edit.rekomendasi ?? '',
-      keterangan: edit.keteranganRekomendasi ?? '',
+      keberlanjutan: `${lulus}\n${edit.rekomendasi ?? ''}\n\n[ ] Disetujui\n[ ] Tidak Disetujui`,
+      ketReko: orDash(edit.keteranganRekomendasi),
+      keterangan: orDash(edit.keterangan),
     };
   });
 
@@ -94,13 +104,13 @@ function ReportDocument({ rows, edits, title }: { rows: any[]; edits: any[]; tit
       jabatan: emp?.jabatan ?? '',
       divisi: emp?.divisi ?? '',
       usia: ageYearsOnly(emp?.tgl_lahir),
-      total: String(sumScores(r.scores)),
-      rata: r.grand_avg?.toFixed?.(2) ?? '',
+      total: fmtInt(sumScores(r.scores)),
+      rata: fmtDec(r.grand_avg ?? 0),
       kinerja: r.form_c_data?.kinerja ?? '',
       potensi: r.form_c_data?.potensi ?? '',
       pengembangan: r.form_c_data?.pengembangan ?? '',
-      kesan: r.form_c_data?.kesanUmum ?? '',
-      saran: r.form_c_data?.saranPengembangan ?? '',
+      kesan: orDash(r.form_c_data?.kesanUmum),
+      saran: orDash(r.form_c_data?.saranPengembangan),
       penilai: r.assignment?.evaluator?.name ?? '',
     };
   });
@@ -112,7 +122,24 @@ function ReportDocument({ rows, edits, title }: { rows: any[]; edits: any[]; tit
         <Text style={styles.subtitle}>{title.toUpperCase()}</Text>
         <ReportTable cols={COLS_1} rows={rows1} />
 
-        <Text style={{ ...styles.subtitle, ...styles.sectionGap }}>PENILAIAN EVALUASI PKWT</Text>
+        <View style={styles.signRow}>
+          <View style={styles.signBlock}>
+            <Text>Menyetujui,</Text>
+            <Text style={styles.signName}>{sign?.namaMenyetujui || '( ..................................... )'}</Text>
+            <Text>{sign?.jabatanMenyetujui || ''}</Text>
+          </View>
+          <View style={styles.signBlock}>
+            <Text>{sign?.tempatTanggal || ''}</Text>
+            <Text style={{ marginTop: 4 }}>Mengajukan,</Text>
+            <Text style={styles.signName}>{sign?.namaMengajukan || '( ..................................... )'}</Text>
+            <Text>{sign?.jabatanMengajukan || ''}</Text>
+          </View>
+        </View>
+      </Page>
+
+      <Page size="A4" orientation="landscape" style={styles.page}>
+        <Text style={styles.title}>EVALUASI USULAN PERPANJANGAN KONTRAK KERJA KARYAWAN PKWT</Text>
+        <Text style={styles.subtitle}>{title.toUpperCase()} — PENILAIAN EVALUASI PKWT</Text>
         <ReportTable cols={COLS_2} rows={rows2} />
       </Page>
     </Document>
@@ -135,8 +162,9 @@ export async function POST(request: Request) {
   const rows = (body.rows ?? []) as any[];
   const edits = (body.edits ?? []) as any[];
   const title: string = body.title ?? 'Semua Divisi';
+  const sign = body.sign ?? {};
 
-  const buffer = await renderToBuffer(<ReportDocument rows={rows} edits={edits} title={title} />);
+  const buffer = await renderToBuffer(<ReportDocument rows={rows} edits={edits} title={title} sign={sign} />);
 
   return new NextResponse(new Uint8Array(buffer), {
     headers: {

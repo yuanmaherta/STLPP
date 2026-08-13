@@ -50,6 +50,13 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
   const [modalType, setModalType] = useState<'excel' | 'pdf' | null>(null);
   const [editState, setEditState] = useState<Record<string, EditEntry>>({});
   const [downloading, setDownloading] = useState(false);
+  const [signState, setSignState] = useState({
+    tempatTanggal: '',
+    namaMenyetujui: '',
+    jabatanMenyetujui: 'Direktur Human Capital & Legal',
+    namaMengajukan: '',
+    jabatanMengajukan: 'Pj. EVP Divisi Human Capital',
+  });
 
   const divisions = useMemo(() => {
     const set = new Set<string>();
@@ -138,6 +145,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
           rows: selectedRows,
           edits: selectedRows.map((r) => ({ id: r.id, ...editState[r.id] })),
           title: reportTitle,
+          sign: signState,
         }),
       });
       if (!res.ok) {
@@ -299,6 +307,57 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
               {exportError && (
                 <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{exportError}</div>
               )}
+
+              <div className="border border-blue-200 bg-blue-50/50 rounded-lg p-4">
+                <p className="font-semibold text-sm text-slate-800 mb-3">Tanda Tangan (muncul sekali di bawah Tabel 1)</p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <label className="block text-xs">
+                    <span className="block text-slate-500 mb-1">Tempat, Tanggal</span>
+                    <input
+                      value={signState.tempatTanggal}
+                      onChange={(e) => setSignState((s) => ({ ...s, tempatTanggal: e.target.value }))}
+                      placeholder="Jakarta, 13 Agustus 2026"
+                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                  <div />
+                  <label className="block text-xs">
+                    <span className="block text-slate-500 mb-1">Nama — Menyetujui</span>
+                    <input
+                      value={signState.namaMenyetujui}
+                      onChange={(e) => setSignState((s) => ({ ...s, namaMenyetujui: e.target.value }))}
+                      placeholder="Nama Direktur"
+                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="block text-slate-500 mb-1">Nama — Mengajukan</span>
+                    <input
+                      value={signState.namaMengajukan}
+                      onChange={(e) => setSignState((s) => ({ ...s, namaMengajukan: e.target.value }))}
+                      placeholder="Nama EVP"
+                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="block text-slate-500 mb-1">Jabatan — Menyetujui</span>
+                    <input
+                      value={signState.jabatanMenyetujui}
+                      onChange={(e) => setSignState((s) => ({ ...s, jabatanMenyetujui: e.target.value }))}
+                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                  <label className="block text-xs">
+                    <span className="block text-slate-500 mb-1">Jabatan — Mengajukan</span>
+                    <input
+                      value={signState.jabatanMengajukan}
+                      onChange={(e) => setSignState((s) => ({ ...s, jabatanMengajukan: e.target.value }))}
+                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                    />
+                  </label>
+                </div>
+              </div>
+
               {selectedRows.map((r) => {
                 const emp = r.assignment?.employee;
                 const edit = editState[r.id] ?? { rekomendasi: '', keteranganRekomendasi: '', keterangan: '' };
