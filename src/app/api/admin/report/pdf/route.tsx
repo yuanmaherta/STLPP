@@ -5,21 +5,24 @@ import { createClient } from '@/lib/supabase/server';
 import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
 
 const styles = StyleSheet.create({
-  page: { padding: 18, fontSize: 6.5, fontFamily: 'Helvetica' },
-  title: { fontSize: 12, fontWeight: 700, textAlign: 'center', marginBottom: 2 },
-  subtitle: { fontSize: 10, fontWeight: 700, textAlign: 'center', marginBottom: 10 },
+  page: { padding: 18, fontSize: 6.5, fontFamily: 'Times-Roman' },
+  title: { fontSize: 13, fontFamily: 'Times-Bold', textAlign: 'center', marginBottom: 2 },
+  subtitle: { fontSize: 11, fontFamily: 'Times-Bold', textAlign: 'center', marginBottom: 10 },
   table: { display: 'flex', width: 'auto', borderStyle: 'solid', borderWidth: 1, borderColor: '#000' },
   row: { flexDirection: 'row' },
-  cell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3 },
-  headerCellGray: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#D9D9D9' },
-  headerCellBlue: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#BDD7EE' },
-  headerCellGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#C6E0B4' },
-  headerCellAmber: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#FFE699' },
-  headerCellNavy: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontWeight: 700, backgroundColor: '#1F3864', color: '#FFFFFF' },
-  dataCellGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, backgroundColor: '#E2EFDA' },
+  // Sel data TANPA warna latar (putih polos) — sesuai file Excel asli
+  cell: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Roman' },
+  // Warna header persis sama dengan Excel (dibaca dari theme file asli)
+  headerCellGray: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#BFBFBF' },
+  headerCellBlue: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#B4C7E7' },
+  headerCellBrightGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#92D050' },
+  headerCellPaleGreen: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#E2EFDA' },
+  headerCellPaleGold: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#FFF2CC' },
+  headerCellNavy: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold', backgroundColor: '#335593', color: '#FFFFFF' },
+  dataCellBold: { borderStyle: 'solid', borderWidth: 0.5, borderColor: '#000', padding: 3, fontFamily: 'Times-Bold' },
   signRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 },
   signBlock: { width: '40%', textAlign: 'center' },
-  signName: { fontWeight: 700, textDecoration: 'underline', marginTop: 30 },
+  signName: { fontFamily: 'Times-Bold', textDecoration: 'underline', marginTop: 30 },
 });
 
 const orDash = (v?: string | null) => (v && v.trim() ? v : '-');
@@ -93,23 +96,23 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
 
         return (
           <View key={i} style={styles.row}>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[0].width as any }}>{i + 1}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[1].width as any }}>{emp?.nama ?? ''}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[2].width as any }}>{emp?.jabatan ?? ''}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[3].width as any }}>{emp?.divisi ?? ''}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[4].width as any }}>{ageYearsOnly(emp?.tgl_lahir)}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[5].width as any }}>{emp?.masa_kerja ?? ''}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: simpleCols[6].width as any }}>{emp?.tgl_habis_kontrak ?? ''}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[0].width as any }}>{i + 1}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[1].width as any }}>{emp?.nama ?? ''}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[2].width as any }}>{emp?.jabatan ?? ''}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[3].width as any }}>{emp?.divisi ?? ''}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[4].width as any }}>{ageYearsOnly(emp?.tgl_lahir)}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[5].width as any }}>{emp?.masa_kerja ?? ''}</Text>
+            <Text style={{ ...styles.cell, width: simpleCols[6].width as any }}>{emp?.tgl_habis_kontrak ?? ''}</Text>
             {[0, 1, 2].map((g) => (
               <React.Fragment key={g}>
-                <Text style={{ ...styles.dataCellGreen, width: evpWidth as any, fontWeight: g === groupIdx ? 700 : 400 }}>
+                <Text style={{ ...styles.cell, width: evpWidth as any, fontFamily: g === groupIdx ? 'Times-Bold' : 'Times-Roman' }}>
                   {g === groupIdx ? statusText : ''}
                 </Text>
-                <Text style={{ ...styles.dataCellGreen, width: dhclWidth as any }}>{g === groupIdx ? checkboxText : ''}</Text>
+                <Text style={{ ...styles.cell, width: dhclWidth as any }}>{g === groupIdx ? checkboxText : ''}</Text>
               </React.Fragment>
             ))}
-            <Text style={{ ...styles.dataCellGreen, width: ketRekoWidth as any }}>{orDash(edit.keteranganRekomendasi)}</Text>
-            <Text style={{ ...styles.dataCellGreen, width: keteranganWidth as any }}>{orDash(edit.keterangan)}</Text>
+            <Text style={{ ...styles.cell, width: ketRekoWidth as any }}>{orDash(edit.keteranganRekomendasi)}</Text>
+            <Text style={{ ...styles.cell, width: keteranganWidth as any }}>{orDash(edit.keterangan)}</Text>
           </View>
         );
       })}
@@ -137,15 +140,23 @@ const COLS_2 = [
 ];
 
 function headerStyleFor(kind: string) {
-  if (kind === 'green') return styles.headerCellGreen;
-  if (kind === 'amber') return styles.headerCellAmber;
+  if (kind === 'green') return styles.headerCellPaleGreen;
+  if (kind === 'amber') return styles.headerCellPaleGold;
   if (kind === 'navy') return styles.headerCellNavy;
   return styles.headerCellBlue;
 }
 
 function Table2({ rows }: { rows: any[] }) {
+  const identityWidth = COLS_2.slice(0, 7).reduce((sum, c) => sum + parseFloat(c.width), 0);
+  const restWidth = 100 - identityWidth;
+
   return (
     <View style={styles.table}>
+      {/* Baris judul grup "Penilaian Evaluasi PKWT" (hijau terang), sejajar dengan Excel */}
+      <View style={styles.row}>
+        <Text style={{ ...styles.headerCellBlue, width: `${identityWidth}%` as any, backgroundColor: 'transparent', borderColor: 'transparent' }} />
+        <Text style={{ ...styles.headerCellBrightGreen, width: `${restWidth}%` as any }}>Penilaian Evaluasi PKWT</Text>
+      </View>
       <View style={styles.row}>
         {COLS_2.map((c) => (
           <Text key={c.key} style={{ ...headerStyleFor(c.style), width: c.width as any }}>
