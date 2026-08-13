@@ -3,7 +3,12 @@
 import { useMemo, useState } from 'react';
 import { Search, Plus, Pencil, Trash2, X, Loader2, AlertCircle, UserRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { DIVISI_LIST, ANAK_PERUSAHAAN_LIST } from '@/lib/data/organisasi';
 import type { Employee } from '@/types';
+
+function isKnownDivisi(value: string): boolean {
+  return DIVISI_LIST.includes(value) || ANAK_PERUSAHAAN_LIST.includes(value);
+}
 
 interface AtasanOption {
   id: string;
@@ -303,13 +308,38 @@ export function KaryawanClient({ initialEmployees, atasanList, loadError }: Kary
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Divisi *</span>
-                  <input
+                  <span className="block text-slate-600 mb-1">Divisi / Unit Kerja *</span>
+                  <select
                     required
-                    value={form.divisi}
-                    onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
+                    value={isKnownDivisi(form.divisi) ? form.divisi : 'LAINNYA'}
+                    onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value === 'LAINNYA' ? '' : e.target.value }))}
                     className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  >
+                    <option value="LAINNYA">- Pilih atau ketik manual di bawah -</option>
+                    <optgroup label="Divisi (Kantor Pusat)">
+                      {DIVISI_LIST.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="Anak Perusahaan / Entitas">
+                      {ANAK_PERUSAHAAN_LIST.map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                  {!isKnownDivisi(form.divisi) && (
+                    <input
+                      required
+                      value={form.divisi}
+                      onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
+                      placeholder="Ketik nama divisi/unit kerja"
+                      className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  )}
                 </label>
               </div>
 
