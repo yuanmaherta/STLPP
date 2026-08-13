@@ -133,7 +133,9 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
     setEditState((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
   };
 
-  const handleDownload = async () => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handleGenerate = async () => {
     if (!modalType) return;
     setDownloading(true);
     setExportError('');
@@ -158,19 +160,43 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
       }
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `laporan-stlpp-${reportTitle.replace(/\s+/g, '-').toLowerCase()}.${modalType === 'excel' ? 'xlsx' : 'pdf'}`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      setModalType(null);
+
+      if (modalType === 'pdf') {
+        // PDF bisa di-preview langsung di browser sebelum didownload
+        setPreviewUrl(url);
+      } else {
+        // Excel tidak bisa di-preview di browser, langsung download seperti biasa
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `laporan-stlpp-${reportTitle.replace(/\s+/g, '-').toLowerCase()}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setModalType(null);
+      }
     } catch (err: any) {
       setExportError(err.message ?? 'Gagal export.');
     } finally {
       setDownloading(false);
     }
+  };
+
+  const confirmDownloadFromPreview = () => {
+    if (!previewUrl) return;
+    const a = document.createElement('a');
+    a.href = previewUrl;
+    a.download = `laporan-stlpp-${reportTitle.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    closePreview();
+    setModalType(null);
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
   };
 
   return (
@@ -405,14 +431,42 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                 Batal
               </button>
               <button
-                onClick={handleDownload}
+                onClick={handleGenerate}
                 disabled={downloading}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
               >
                 {downloading && <Loader2 className="w-4 h-4 animate-spin" />}
-                Download {modalType === 'excel' ? 'Excel' : 'PDF'}
+                {modalType === 'excel' ? 'Download Excel' : 'Preview PDF'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {previewUrl && (
+        <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-[60]">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-5xl h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+              <div>
+                <h2 className="font-bold text-slate-800">Preview PDF</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Cek dulu hasilnya — kalau ada yang perlu diubah, kembali ke form edit.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={closePreview}
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                >
+                  Kembali Edit
+                </button>
+                <button
+                  onClick={confirmDownloadFromPreview}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white hover:bg-emerald-700"
+                >
+                  <FileText className="w-4 h-4" /> Download PDF
+                </button>
+              </div>
+            </div>
+            <iframe src={previewUrl} title="Preview PDF Laporan" className="flex-1 w-full rounded-b-xl" />
           </div>
         </div>
       )}
