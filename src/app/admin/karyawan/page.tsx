@@ -1,14 +1,29 @@
-import { Users } from 'lucide-react';
-import { ComingSoon } from '@/components/layout/coming-soon';
+import { createClient } from '@/lib/supabase/server';
+import { KaryawanClient } from '@/components/karyawan/karyawan-client';
 
-export default function MasterKaryawanPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function MasterKaryawanPage() {
+  const supabase = createClient();
+
+  const { data: employees, error: employeesError } = await supabase
+    .from('employees')
+    .select('*')
+    .order('nama', { ascending: true });
+
+  const { data: atasanList, error: atasanError } = await supabase
+    .from('users')
+    .select('id, name, email')
+    .eq('role', 'ATASAN')
+    .order('name', { ascending: true });
+
   return (
     <div>
       <h1 className="text-2xl font-bold text-slate-800 mb-6">Master Karyawan</h1>
-      <ComingSoon
-        title="Master Data Karyawan"
-        description="Tabel CRUD karyawan PKWT (tambah, edit, import dari Excel) akan tampil di sini, tersambung ke tabel employees."
-        icon={Users}
+      <KaryawanClient
+        initialEmployees={employees ?? []}
+        atasanList={atasanList ?? []}
+        loadError={employeesError?.message ?? atasanError?.message ?? null}
       />
     </div>
   );
