@@ -78,7 +78,7 @@ export function Sidebar({ variant }: SidebarProps) {
   const initial = (userName ?? '?').trim().charAt(0).toUpperCase();
 
   return (
-    <aside className="w-64 shrink-0 bg-white border-r border-navy-100 min-h-screen flex flex-col">
+    <aside className="w-64 shrink-0 bg-white border-r border-navy-100 h-screen flex flex-col overflow-hidden">
       <div className="px-5 py-5 flex items-center gap-2.5">
         <div className="shrink-0 w-9 h-9 flex items-center justify-center">
           <Image src="/hk-icon.png" alt="Hutama Karya" width={32} height={16} className="w-full h-auto object-contain" />
@@ -89,7 +89,7 @@ export function Sidebar({ variant }: SidebarProps) {
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-3 space-y-1">
+      <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
         {items.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
