@@ -58,7 +58,7 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative p-2 rounded-lg hover:bg-navy-50 transition-colors"
+        className="relative p-2 rounded-lg hover:bg-navy-50 active:scale-90 transition-all"
         aria-label="Notifikasi"
       >
         <Bell className="w-5 h-5 text-navy-600" />
@@ -72,7 +72,7 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-navy-100 shadow-lg z-50 max-h-96 overflow-y-auto">
+          <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-navy-100 shadow-card-hover z-50 max-h-96 overflow-y-auto animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-150 origin-top-right">
             <div className="flex items-center justify-between px-4 py-3 border-b border-navy-50 sticky top-0 bg-white">
               <span className="font-semibold text-sm text-navy-900">Notifikasi</span>
               {unreadCount > 0 && (

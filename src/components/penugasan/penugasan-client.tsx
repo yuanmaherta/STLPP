@@ -254,8 +254,8 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-navy-950/50 backdrop-blur-[2px] flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-card-hover w-full max-w-2xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
             <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
               <h2 className="font-bold text-navy-900">Tugaskan Penilaian</h2>
               <button onClick={() => !saving && setModalOpen(false)} className="text-navy-300 hover:text-navy-600">

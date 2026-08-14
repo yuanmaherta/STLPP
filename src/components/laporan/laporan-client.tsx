@@ -315,8 +315,8 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
       </div>
 
       {modalType && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[85vh] flex flex-col">
+        <div className="fixed inset-0 bg-navy-950/50 backdrop-blur-[2px] flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl shadow-card-hover w-full max-w-3xl max-h-[85vh] flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
             <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
               <div>
                 <h2 className="font-bold text-navy-900">Lengkapi sebelum export {modalType === 'excel' ? 'Excel' : 'PDF'}</h2>
@@ -445,7 +445,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
 
       {previewUrl && (
         <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-[60]">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-5xl h-[90vh] flex flex-col">
+          <div className="bg-white rounded-2xl shadow-card-hover w-full max-w-5xl h-[90vh] flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200">
             <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
               <div>
                 <h2 className="font-bold text-navy-900">Preview PDF</h2>

@@ -26,6 +26,11 @@ body {
 ::-webkit-scrollbar-thumb { background: #D6DDE9; border-radius: 999px; }
 ::-webkit-scrollbar-thumb:hover { background: #AEBBD3; }
 
+/* Feedback tekan yang halus untuk semua tombol — kesan "solid", bukan cuma ganti warna */
+button:not(:disabled):active {
+  transform: scale(0.97);
+}
+
 .font-display {
   letter-spacing: -0.015em;
 }
