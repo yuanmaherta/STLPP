@@ -38,7 +38,7 @@ interface PenugasanClientProps {
 const STATUS_STYLE: Record<AssignmentRow['status'], string> = {
   PENDING: 'bg-amber-100 text-amber-800',
   COMPLETED: 'bg-emerald-100 text-emerald-800',
-  UNASSIGNED: 'bg-slate-100 text-slate-600',
+  UNASSIGNED: 'bg-navy-50 text-navy-600',
 };
 
 const STATUS_LABEL: Record<AssignmentRow['status'], string> = {
@@ -182,21 +182,21 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl shadow-card border border-navy-100 overflow-hidden">
+        <div className="p-4 border-b border-navy-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-navy-300" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari karyawan / atasan / periode..."
-              className="pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-72"
+              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-72"
             />
           </div>
           <button
             onClick={openAdd}
             disabled={employees.length === 0 || atasanList.length === 0}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" /> Tugaskan Penilaian
           </button>
@@ -204,7 +204,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+            <thead className="bg-canvas text-navy-600 border-b border-navy-100 font-semibold">
               <tr>
                 <th className="p-4">Karyawan</th>
                 <th className="p-4">Atasan Penilai</th>
@@ -214,16 +214,16 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                 <th className="p-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-navy-50">
               {filtered.map((a) => (
-                <tr key={a.id} className="hover:bg-slate-50 transition-colors">
+                <tr key={a.id} className="hover:bg-canvas transition-colors">
                   <td className="p-4">
-                    <p className="font-semibold text-slate-800">{a.employee?.nama ?? '-'}</p>
-                    <p className="text-xs text-slate-400">{a.employee?.jabatan}</p>
+                    <p className="font-semibold text-navy-900">{a.employee?.nama ?? '-'}</p>
+                    <p className="text-xs text-navy-300">{a.employee?.jabatan}</p>
                   </td>
-                  <td className="p-4 text-slate-600">{a.evaluator?.name ?? '-'}</td>
-                  <td className="p-4 text-slate-600">{a.period}</td>
-                  <td className="p-4 text-slate-600">{a.deadline}</td>
+                  <td className="p-4 text-navy-600">{a.evaluator?.name ?? '-'}</td>
+                  <td className="p-4 text-navy-600">{a.period}</td>
+                  <td className="p-4 text-navy-600">{a.deadline}</td>
                   <td className="p-4">
                     <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${STATUS_STYLE[a.status]}`}>
                       {STATUS_LABEL[a.status]}
@@ -243,7 +243,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-400">
+                  <td colSpan={6} className="p-8 text-center text-navy-300">
                     {assignments.length === 0 ? 'Belum ada penugasan.' : 'Tidak ada hasil yang cocok.'}
                   </td>
                 </tr>
@@ -256,9 +256,9 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
       {modalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800">Tugaskan Penilaian</h2>
-              <button onClick={() => !saving && setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
+              <h2 className="font-bold text-navy-900">Tugaskan Penilaian</h2>
+              <button onClick={() => !saving && setModalOpen(false)} className="text-navy-300 hover:text-navy-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -270,23 +270,23 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="block text-sm text-slate-600">Karyawan * (bisa pilih beberapa sekaligus)</span>
-                  <span className="text-xs text-slate-400">{selectedEmployeeIds.size} dipilih</span>
+                  <span className="block text-sm text-navy-600">Karyawan * (bisa pilih beberapa sekaligus)</span>
+                  <span className="text-xs text-navy-300">{selectedEmployeeIds.size} dipilih</span>
                 </div>
                 <div className="relative mb-2">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-navy-300" />
                   <input
                     value={empSearch}
                     onChange={(e) => setEmpSearch(e.target.value)}
                     placeholder="Cari nama / NIK / divisi..."
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-navy-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </div>
-                <div className="border border-slate-200 rounded-lg max-h-64 overflow-y-auto">
+                <div className="border border-navy-100 rounded-lg max-h-64 overflow-y-auto">
                   <button
                     type="button"
                     onClick={toggleAllEmp}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-slate-500 bg-slate-50 border-b border-slate-200 sticky top-0"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-navy-400 bg-canvas border-b border-navy-100 sticky top-0"
                   >
                     {allFilteredEmpSelected ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
                     Pilih semua ({filteredEmployees.length})
@@ -294,30 +294,30 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                   {filteredEmployees.map((emp) => (
                     <label
                       key={emp.id}
-                      className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-slate-50 cursor-pointer border-b border-slate-50 last:border-0"
+                      className="flex items-center gap-3 px-3 py-2 text-sm hover:bg-canvas cursor-pointer border-b border-slate-50 last:border-0"
                     >
                       <input type="checkbox" checked={selectedEmployeeIds.has(emp.id)} onChange={() => toggleEmp(emp.id)} className="w-4 h-4 shrink-0" />
                       <span className="flex-1">
-                        <span className="font-medium text-slate-800">{emp.nama}</span>{' '}
-                        <span className="text-slate-400 text-xs">({emp.nik})</span>
+                        <span className="font-medium text-navy-900">{emp.nama}</span>{' '}
+                        <span className="text-navy-300 text-xs">({emp.nik})</span>
                         <br />
-                        <span className="text-xs text-slate-400">
+                        <span className="text-xs text-navy-300">
                           {emp.jabatan} — {emp.divisi}
                         </span>
                       </span>
                     </label>
                   ))}
-                  {filteredEmployees.length === 0 && <div className="px-3 py-6 text-center text-xs text-slate-400">Tidak ada hasil.</div>}
+                  {filteredEmployees.length === 0 && <div className="px-3 py-6 text-center text-xs text-navy-300">Tidak ada hasil.</div>}
                 </div>
               </div>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Atasan Penilai *</span>
+                <span className="block text-navy-600 mb-1">Atasan Penilai *</span>
                 <select
                   required
                   value={evaluatorId}
                   onChange={(e) => setEvaluatorId(e.target.value)}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 >
                   <option value="">- Pilih atasan -</option>
                   {atasanList.map((a) => (
@@ -330,23 +330,23 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Periode *</span>
+                  <span className="block text-navy-600 mb-1">Periode *</span>
                   <input
                     required
                     placeholder="cth: Agustus 2026"
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Deadline *</span>
+                  <span className="block text-navy-600 mb-1">Deadline *</span>
                   <input
                     required
                     type="date"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
               </div>
@@ -355,14 +355,14 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-navy-600 hover:bg-navy-50"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   Tugaskan {selectedEmployeeIds.size > 0 ? `(${selectedEmployeeIds.size} karyawan)` : ''}

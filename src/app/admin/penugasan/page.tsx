@@ -26,7 +26,7 @@ export default async function PenugasanPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Penugasan Evaluasi</h1>
+      <h1 className="text-2xl font-bold text-navy-900 mb-6 font-display">Penugasan Evaluasi</h1>
       <PenugasanClient
         initialAssignments={(assignments as any) ?? []}
         employees={employees ?? []}

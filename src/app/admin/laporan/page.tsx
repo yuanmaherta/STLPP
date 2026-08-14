@@ -15,7 +15,7 @@ export default async function LaporanPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Laporan</h1>
+      <h1 className="text-2xl font-bold text-navy-900 mb-6 font-display">Laporan</h1>
       <LaporanClient initialRows={(rows as any) ?? []} loadError={error?.message ?? null} />
     </div>
   );

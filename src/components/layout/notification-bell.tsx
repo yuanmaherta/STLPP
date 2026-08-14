@@ -58,10 +58,10 @@ export function NotificationBell() {
     <div className="relative">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="relative p-2 rounded-lg hover:bg-slate-100 transition-colors"
+        className="relative p-2 rounded-lg hover:bg-navy-50 transition-colors"
         aria-label="Notifikasi"
       >
-        <Bell className="w-5 h-5 text-slate-600" />
+        <Bell className="w-5 h-5 text-navy-600" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -72,28 +72,28 @@ export function NotificationBell() {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-slate-200 shadow-lg z-50 max-h-96 overflow-y-auto">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 sticky top-0 bg-white">
-              <span className="font-semibold text-sm text-slate-800">Notifikasi</span>
+          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl border border-navy-100 shadow-lg z-50 max-h-96 overflow-y-auto">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-navy-50 sticky top-0 bg-white">
+              <span className="font-semibold text-sm text-navy-900">Notifikasi</span>
               {unreadCount > 0 && (
-                <button onClick={markAllRead} className="text-xs text-blue-600 hover:underline">
+                <button onClick={markAllRead} className="text-xs text-navy-700 hover:underline">
                   Tandai semua dibaca
                 </button>
               )}
             </div>
             {notifs.length === 0 ? (
-              <div className="p-6 text-center text-sm text-slate-400">Belum ada notifikasi.</div>
+              <div className="p-6 text-center text-sm text-navy-300">Belum ada notifikasi.</div>
             ) : (
               notifs.map((n) => (
                 <button
                   key={n.id}
                   onClick={() => handleClick(n)}
-                  className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-slate-50 text-sm transition-colors ${
-                    !n.is_read ? 'bg-blue-50/60' : ''
+                  className={`w-full text-left px-4 py-3 border-b border-slate-50 hover:bg-canvas text-sm transition-colors ${
+                    !n.is_read ? 'bg-navy-50/60' : ''
                   }`}
                 >
-                  <p className={`text-slate-700 ${!n.is_read ? 'font-semibold' : ''}`}>{n.message}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{new Date(n.created_at).toLocaleString('id-ID')}</p>
+                  <p className={`text-navy-800 ${!n.is_read ? 'font-semibold' : ''}`}>{n.message}</p>
+                  <p className="text-xs text-navy-300 mt-0.5">{new Date(n.created_at).toLocaleString('id-ID')}</p>
                 </button>
               ))
             )}

@@ -15,7 +15,7 @@ export default async function TemplateFormPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Template Form Evaluasi</h1>
+      <h1 className="text-2xl font-bold text-navy-900 mb-6 font-display">Template Form Evaluasi</h1>
       <TemplateEditorClient initialStructure={active.structure} activeVersion={active.version} history={history ?? []} />
     </div>
   );

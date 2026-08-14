@@ -17,7 +17,7 @@ export default async function ManajemenPenggunaPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Manajemen Pengguna</h1>
+      <h1 className="text-2xl font-bold text-navy-900 mb-6 font-display">Manajemen Pengguna</h1>
       <PenggunaClient initialUsers={users ?? []} loadError={error?.message ?? null} currentUserId={currentUser?.id ?? ''} />
     </div>
   );

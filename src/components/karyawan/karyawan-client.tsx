@@ -153,20 +153,20 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl shadow-card border border-navy-100 overflow-hidden">
+        <div className="p-4 border-b border-navy-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-navy-300" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari NIK / Nama / Divisi..."
-              className="pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-72"
+              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-72"
             />
           </div>
           <button
             onClick={openAdd}
-            className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+            className="flex items-center justify-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors"
           >
             <Plus className="w-4 h-4" /> Tambah Karyawan
           </button>
@@ -174,7 +174,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+            <thead className="bg-canvas text-navy-600 border-b border-navy-100 font-semibold">
               <tr>
                 <th className="p-4">NIK</th>
                 <th className="p-4">Nama</th>
@@ -184,24 +184,24 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                 <th className="p-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-navy-50">
               {filtered.map((emp) => (
-                <tr key={emp.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4 font-mono text-xs font-bold text-slate-700">{emp.nik}</td>
-                  <td className="p-4 font-semibold text-slate-800">{emp.nama}</td>
+                <tr key={emp.id} className="hover:bg-canvas transition-colors">
+                  <td className="p-4 font-mono text-xs font-bold text-navy-800">{emp.nik}</td>
+                  <td className="p-4 font-semibold text-navy-900">{emp.nama}</td>
                   <td className="p-4">
-                    <p className="text-slate-800">{emp.jabatan}</p>
-                    <p className="text-xs text-slate-400">{emp.divisi}</p>
+                    <p className="text-navy-900">{emp.jabatan}</p>
+                    <p className="text-xs text-navy-300">{emp.divisi}</p>
                   </td>
                   <td className="p-4">
-                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold bg-navy-50 text-navy-800">
                       {emp.status_kontrak}
                     </span>
                   </td>
-                  <td className="p-4 text-slate-600">{emp.tgl_habis_kontrak}</td>
+                  <td className="p-4 text-navy-600">{emp.tgl_habis_kontrak}</td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-3">
-                      <button onClick={() => openEdit(emp)} className="text-blue-600 hover:text-blue-800" title="Edit">
+                      <button onClick={() => openEdit(emp)} className="text-navy-700 hover:text-navy-900" title="Edit">
                         <Pencil className="w-4 h-4" />
                       </button>
                       <button
@@ -222,7 +222,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-slate-400">
+                  <td colSpan={6} className="p-8 text-center text-navy-300">
                     {employees.length === 0 ? 'Belum ada data karyawan.' : 'Tidak ada hasil yang cocok.'}
                   </td>
                 </tr>
@@ -235,9 +235,9 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
       {modalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800">{form.id ? 'Edit Karyawan' : 'Tambah Karyawan'}</h2>
-              <button onClick={closeModal} className="text-slate-400 hover:text-slate-600">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
+              <h2 className="font-bold text-navy-900">{form.id ? 'Edit Karyawan' : 'Tambah Karyawan'}</h2>
+              <button onClick={closeModal} className="text-navy-300 hover:text-navy-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -251,52 +251,52 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="text-sm col-span-1">
-                  <span className="block text-slate-600 mb-1">NIK *</span>
+                  <span className="block text-navy-600 mb-1">NIK *</span>
                   <input
                     required
                     value={form.nik}
                     onChange={(e) => setForm((f) => ({ ...f, nik: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
                 <label className="text-sm col-span-1">
-                  <span className="block text-slate-600 mb-1">Tanggal Lahir</span>
+                  <span className="block text-navy-600 mb-1">Tanggal Lahir</span>
                   <input
                     type="date"
                     value={form.tgl_lahir}
                     onChange={(e) => setForm((f) => ({ ...f, tgl_lahir: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
               </div>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Nama Lengkap *</span>
+                <span className="block text-navy-600 mb-1">Nama Lengkap *</span>
                 <input
                   required
                   value={form.nama}
                   onChange={(e) => setForm((f) => ({ ...f, nama: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
               </label>
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Jabatan *</span>
+                  <span className="block text-navy-600 mb-1">Jabatan *</span>
                   <input
                     required
                     value={form.jabatan}
                     onChange={(e) => setForm((f) => ({ ...f, jabatan: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Divisi / Unit Kerja *</span>
+                  <span className="block text-navy-600 mb-1">Divisi / Unit Kerja *</span>
                   <select
                     required
                     value={form.divisi}
                     onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   >
                     <option value="">- Pilih -</option>
                     <optgroup label="Divisi (Kantor Pusat)">
@@ -318,31 +318,31 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
               </div>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Bagian</span>
+                <span className="block text-navy-600 mb-1">Bagian</span>
                 <input
                   value={form.bagian}
                   onChange={(e) => setForm((f) => ({ ...f, bagian: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
               </label>
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Masa Kerja</span>
+                  <span className="block text-navy-600 mb-1">Masa Kerja</span>
                   <input
                     placeholder="cth: 2 Tahun 3 Bulan"
                     value={form.masa_kerja}
                     onChange={(e) => setForm((f) => ({ ...f, masa_kerja: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   />
                 </label>
                 <label className="text-sm">
-                  <span className="block text-slate-600 mb-1">Status Kontrak *</span>
+                  <span className="block text-navy-600 mb-1">Status Kontrak *</span>
                   <select
                     required
                     value={form.status_kontrak}
                     onChange={(e) => setForm((f) => ({ ...f, status_kontrak: e.target.value }))}
-                    className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                   >
                     {STATUS_KONTRAK_LIST.map((s) => (
                       <option key={s} value={s}>
@@ -354,16 +354,16 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
               </div>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Akhir Kontrak *</span>
+                <span className="block text-navy-600 mb-1">Akhir Kontrak *</span>
                 <input
                   required
                   type="date"
                   value={form.tgl_habis_kontrak}
                   onChange={(e) => setForm((f) => ({ ...f, tgl_habis_kontrak: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
               </label>
-              <p className="text-xs text-slate-400 -mt-2">
+              <p className="text-xs text-navy-300 -mt-2">
                 Atasan penilai diatur dari menu <b>Penugasan</b>, bukan di sini.
               </p>
 
@@ -371,14 +371,14 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-navy-600 hover:bg-navy-50"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   Simpan

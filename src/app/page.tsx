@@ -5,8 +5,8 @@
 // Konten di bawah ini praktis tidak pernah terlihat user, hanya fallback.
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-      <p className="text-sm text-slate-400">Mengalihkan...</p>
+    <div className="min-h-screen bg-navy-50 flex items-center justify-center">
+      <p className="text-sm text-navy-300">Mengalihkan...</p>
     </div>
   );
 }

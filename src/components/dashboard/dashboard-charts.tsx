@@ -44,9 +44,9 @@ export function DashboardCharts({ employees, assignments, evaluations }: Dashboa
 
   return (
     <div className="grid lg:grid-cols-2 gap-4 mb-8">
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-        <h3 className="font-bold text-slate-800 text-sm mb-1">Distribusi Status Kontrak</h3>
-        <p className="text-xs text-slate-400 mb-4">Jumlah karyawan per status kontrak (Kontrak 1, 2, dst.)</p>
+      <div className="bg-white rounded-xl border border-navy-100 shadow-card p-5">
+        <h3 className="font-bold text-navy-900 text-sm mb-1">Distribusi Status Kontrak</h3>
+        <p className="text-xs text-navy-300 mb-4">Jumlah karyawan per status kontrak (Kontrak 1, 2, dst.)</p>
         {kontrakData.length === 0 ? (
           <EmptyChart />
         ) : (
@@ -62,9 +62,9 @@ export function DashboardCharts({ employees, assignments, evaluations }: Dashboa
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
-        <h3 className="font-bold text-slate-800 text-sm mb-1">Progress Penilaian per Periode</h3>
-        <p className="text-xs text-slate-400 mb-4">Target penugasan vs yang sudah selesai dinilai</p>
+      <div className="bg-white rounded-xl border border-navy-100 shadow-card p-5">
+        <h3 className="font-bold text-navy-900 text-sm mb-1">Progress Penilaian per Periode</h3>
+        <p className="text-xs text-navy-300 mb-4">Target penugasan vs yang sudah selesai dinilai</p>
         {progressData.length === 0 ? (
           <EmptyChart />
         ) : (
@@ -82,9 +82,9 @@ export function DashboardCharts({ employees, assignments, evaluations }: Dashboa
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 lg:col-span-2">
-        <h3 className="font-bold text-slate-800 text-sm mb-1">Kata Kunci Tersering — Saran &amp; Pengembangan</h3>
-        <p className="text-xs text-slate-400 mb-4">Diambil dari kolom "Saran &amp; Pengembangan" dan "Kesan-kesan Umum" semua evaluasi yang masuk</p>
+      <div className="bg-white rounded-xl border border-navy-100 shadow-card p-5 lg:col-span-2">
+        <h3 className="font-bold text-navy-900 text-sm mb-1">Kata Kunci Tersering — Saran &amp; Pengembangan</h3>
+        <p className="text-xs text-navy-300 mb-4">Diambil dari kolom "Saran &amp; Pengembangan" dan "Kesan-kesan Umum" semua evaluasi yang masuk</p>
         {keywordData.length === 0 ? (
           <EmptyChart />
         ) : (
@@ -104,5 +104,5 @@ export function DashboardCharts({ employees, assignments, evaluations }: Dashboa
 }
 
 function EmptyChart() {
-  return <div className="h-40 flex items-center justify-center text-sm text-slate-400">Belum ada data untuk ditampilkan.</div>;
+  return <div className="h-40 flex items-center justify-center text-sm text-navy-300">Belum ada data untuk ditampilkan.</div>;
 }

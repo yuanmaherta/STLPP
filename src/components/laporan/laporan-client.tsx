@@ -214,22 +214,22 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl shadow-card border border-navy-100 overflow-hidden">
+        <div className="p-4 border-b border-navy-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-navy-300" />
               <input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari NIK / Nama..."
-                className="pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-56"
+                className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-56"
               />
             </div>
             <select
               value={divisiFilter}
               onChange={(e) => setDivisiFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600"
             >
               <option value="">Semua Divisi</option>
               {divisions.map((d) => (
@@ -241,7 +241,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-400 mr-2">{selected.size} dipilih</span>
+            <span className="text-xs text-navy-300 mr-2">{selected.size} dipilih</span>
             <button
               onClick={() => openExportModal('excel')}
               className="flex items-center gap-1.5 bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-emerald-700"
@@ -259,7 +259,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+            <thead className="bg-canvas text-navy-600 border-b border-navy-100 font-semibold">
               <tr>
                 <th className="p-4 w-10">
                   <input type="checkbox" checked={allFilteredSelected} onChange={toggleAll} className="w-4 h-4" />
@@ -273,21 +273,21 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                 <th className="p-4">Penilai</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-navy-50">
               {filtered.map((r) => {
                 const emp = r.assignment?.employee;
                 return (
-                  <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                  <tr key={r.id} className="hover:bg-canvas transition-colors">
                     <td className="p-4">
                       <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggleOne(r.id)} className="w-4 h-4" />
                     </td>
-                    <td className="p-4 font-mono text-xs font-bold text-slate-700">{emp?.nik}</td>
-                    <td className="p-4 font-semibold text-slate-800">{emp?.nama}</td>
+                    <td className="p-4 font-mono text-xs font-bold text-navy-800">{emp?.nik}</td>
+                    <td className="p-4 font-semibold text-navy-900">{emp?.nama}</td>
                     <td className="p-4">
-                      <p className="text-slate-800">{emp?.divisi}</p>
-                      <p className="text-xs text-slate-400">{emp?.jabatan}</p>
+                      <p className="text-navy-900">{emp?.divisi}</p>
+                      <p className="text-xs text-navy-300">{emp?.jabatan}</p>
                     </td>
-                    <td className="p-4 text-slate-600">{r.assignment?.period}</td>
+                    <td className="p-4 text-navy-600">{r.assignment?.period}</td>
                     <td className="p-4 text-center font-bold">{r.grand_avg?.toFixed(2)}</td>
                     <td className="p-4">
                       <span
@@ -298,13 +298,13 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                         {r.recommendation === 'DI PERPANJANG' ? `Diperpanjang${r.duration ? ` ${r.duration} Bln` : ''}` : 'Tidak Diperpanjang'}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-600">{r.assignment?.evaluator?.name}</td>
+                    <td className="p-4 text-navy-600">{r.assignment?.evaluator?.name}</td>
                   </tr>
                 );
               })}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-400">
+                  <td colSpan={8} className="p-8 text-center text-navy-300">
                     {initialRows.length === 0 ? 'Belum ada evaluasi yang selesai.' : 'Tidak ada hasil yang cocok.'}
                   </td>
                 </tr>
@@ -317,14 +317,14 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
       {modalType && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-3xl max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
               <div>
-                <h2 className="font-bold text-slate-800">Lengkapi sebelum export {modalType === 'excel' ? 'Excel' : 'PDF'}</h2>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <h2 className="font-bold text-navy-900">Lengkapi sebelum export {modalType === 'excel' ? 'Excel' : 'PDF'}</h2>
+                <p className="text-xs text-navy-400 mt-0.5">
                   Judul laporan: <span className="font-semibold">{reportTitle}</span> — {selectedRows.length} karyawan
                 </p>
               </div>
-              <button onClick={() => !downloading && setModalType(null)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => !downloading && setModalType(null)} className="text-navy-300 hover:text-navy-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -334,51 +334,51 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                 <div className="text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{exportError}</div>
               )}
 
-              <div className="border border-blue-200 bg-blue-50/50 rounded-lg p-4">
-                <p className="font-semibold text-sm text-slate-800 mb-3">Tanda Tangan (muncul sekali di bawah Tabel 1)</p>
+              <div className="border border-blue-200 bg-navy-50/50 rounded-lg p-4">
+                <p className="font-semibold text-sm text-navy-900 mb-3">Tanda Tangan (muncul sekali di bawah Tabel 1)</p>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <label className="block text-xs">
-                    <span className="block text-slate-500 mb-1">Tempat, Tanggal</span>
+                    <span className="block text-navy-400 mb-1">Tempat, Tanggal</span>
                     <input
                       value={signState.tempatTanggal}
                       onChange={(e) => setSignState((s) => ({ ...s, tempatTanggal: e.target.value }))}
                       placeholder="Jakarta, 13 Agustus 2026"
-                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                     />
                   </label>
                   <div />
                   <label className="block text-xs">
-                    <span className="block text-slate-500 mb-1">Nama — Menyetujui</span>
+                    <span className="block text-navy-400 mb-1">Nama — Menyetujui</span>
                     <input
                       value={signState.namaMenyetujui}
                       onChange={(e) => setSignState((s) => ({ ...s, namaMenyetujui: e.target.value }))}
                       placeholder="Nama Direktur"
-                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                     />
                   </label>
                   <label className="block text-xs">
-                    <span className="block text-slate-500 mb-1">Nama — Mengajukan</span>
+                    <span className="block text-navy-400 mb-1">Nama — Mengajukan</span>
                     <input
                       value={signState.namaMengajukan}
                       onChange={(e) => setSignState((s) => ({ ...s, namaMengajukan: e.target.value }))}
                       placeholder="Nama EVP"
-                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                     />
                   </label>
                   <label className="block text-xs">
-                    <span className="block text-slate-500 mb-1">Jabatan — Menyetujui</span>
+                    <span className="block text-navy-400 mb-1">Jabatan — Menyetujui</span>
                     <input
                       value={signState.jabatanMenyetujui}
                       onChange={(e) => setSignState((s) => ({ ...s, jabatanMenyetujui: e.target.value }))}
-                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                     />
                   </label>
                   <label className="block text-xs">
-                    <span className="block text-slate-500 mb-1">Jabatan — Mengajukan</span>
+                    <span className="block text-navy-400 mb-1">Jabatan — Mengajukan</span>
                     <input
                       value={signState.jabatanMengajukan}
                       onChange={(e) => setSignState((s) => ({ ...s, jabatanMengajukan: e.target.value }))}
-                      className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                      className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                     />
                   </label>
                 </div>
@@ -388,33 +388,33 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                 const emp = r.assignment?.employee;
                 const edit = editState[r.id] ?? { rekomendasi: '', keteranganRekomendasi: '', keterangan: '' };
                 return (
-                  <div key={r.id} className="border border-slate-200 rounded-lg p-4">
-                    <p className="font-semibold text-sm text-slate-800 mb-3">{emp?.nama}</p>
+                  <div key={r.id} className="border border-navy-100 rounded-lg p-4">
+                    <p className="font-semibold text-sm text-navy-900 mb-3">{emp?.nama}</p>
                     <label className="block text-xs mb-2">
-                      <span className="block text-slate-500 mb-1">Rekomendasi</span>
+                      <span className="block text-navy-400 mb-1">Rekomendasi</span>
                       <input
                         value={edit.rekomendasi}
                         onChange={(e) => updateEdit(r.id, 'rekomendasi', e.target.value)}
-                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                        className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                       />
                     </label>
                     <label className="block text-xs mb-2">
-                      <span className="block text-slate-500 mb-1">Keterangan Rekomendasi</span>
+                      <span className="block text-navy-400 mb-1">Keterangan Rekomendasi</span>
                       <textarea
                         rows={3}
                         value={edit.keteranganRekomendasi}
                         onChange={(e) => updateEdit(r.id, 'keteranganRekomendasi', e.target.value)}
                         placeholder="cth: 1. Hasil evaluasi memenuhi minimal standard. 2. Dilakukan perpanjangan sesuai Nota Dinas Nomor ..."
-                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                        className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                       />
                     </label>
                     <label className="block text-xs">
-                      <span className="block text-slate-500 mb-1">Keterangan</span>
+                      <span className="block text-navy-400 mb-1">Keterangan</span>
                       <input
                         value={edit.keterangan}
                         onChange={(e) => updateEdit(r.id, 'keterangan', e.target.value)}
                         placeholder="cth: Kontrak Pusat"
-                        className="w-full border border-slate-300 rounded-md px-2 py-1.5 text-sm"
+                        className="w-full border border-navy-200 rounded-md px-2 py-1.5 text-sm"
                       />
                     </label>
                   </div>
@@ -422,18 +422,18 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
               })}
             </div>
 
-            <div className="flex justify-end gap-2 px-6 py-4 border-t border-slate-200">
+            <div className="flex justify-end gap-2 px-6 py-4 border-t border-navy-100">
               <button
                 onClick={() => setModalType(null)}
                 disabled={downloading}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-navy-600 hover:bg-navy-50"
               >
                 Batal
               </button>
               <button
                 onClick={handleGenerate}
                 disabled={downloading}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-60"
               >
                 {downloading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {modalType === 'excel' ? 'Download Excel' : 'Preview PDF'}
@@ -446,15 +446,15 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
       {previewUrl && (
         <div className="fixed inset-0 bg-slate-900/70 flex items-center justify-center p-4 z-[60]">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-5xl h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
               <div>
-                <h2 className="font-bold text-slate-800">Preview PDF</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Cek dulu hasilnya — kalau ada yang perlu diubah, kembali ke form edit.</p>
+                <h2 className="font-bold text-navy-900">Preview PDF</h2>
+                <p className="text-xs text-navy-400 mt-0.5">Cek dulu hasilnya — kalau ada yang perlu diubah, kembali ke form edit.</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={closePreview}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-navy-600 hover:bg-navy-50"
                 >
                   Kembali Edit
                 </button>

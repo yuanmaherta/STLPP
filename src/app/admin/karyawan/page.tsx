@@ -13,7 +13,7 @@ export default async function MasterKaryawanPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-800 mb-6">Master Karyawan</h1>
+      <h1 className="text-2xl font-bold text-navy-900 mb-6 font-display">Master Karyawan</h1>
       <KaryawanClient initialEmployees={employees ?? []} loadError={error?.message ?? null} />
     </div>
   );

@@ -112,12 +112,12 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="p-4 border-b border-slate-200 flex items-center justify-between">
-          <p className="text-sm text-slate-500">{users.length} akun terdaftar</p>
+      <div className="bg-white rounded-2xl shadow-card border border-navy-100 overflow-hidden">
+        <div className="p-4 border-b border-navy-100 flex items-center justify-between">
+          <p className="text-sm text-navy-400">{users.length} akun terdaftar</p>
           <button
             onClick={openAdd}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors"
           >
             <Plus className="w-4 h-4" /> Tambah Akun
           </button>
@@ -125,7 +125,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 font-semibold">
+            <thead className="bg-canvas text-navy-600 border-b border-navy-100 font-semibold">
               <tr>
                 <th className="p-4">Nama</th>
                 <th className="p-4">Email</th>
@@ -133,17 +133,17 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                 <th className="p-4 text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-navy-50">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4 font-semibold text-slate-800">
-                    {u.name} {u.id === currentUserId && <span className="text-xs text-slate-400 font-normal">(kamu)</span>}
+                <tr key={u.id} className="hover:bg-canvas transition-colors">
+                  <td className="p-4 font-semibold text-navy-900">
+                    {u.name} {u.id === currentUserId && <span className="text-xs text-navy-300 font-normal">(kamu)</span>}
                   </td>
-                  <td className="p-4 text-slate-600">{u.email}</td>
+                  <td className="p-4 text-navy-600">{u.email}</td>
                   <td className="p-4">
                     <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        u.role === 'ADMIN' ? 'bg-blue-100 text-blue-800' : 'bg-teal-100 text-teal-800'
+                        u.role === 'ADMIN' ? 'bg-blue-100 text-navy-900' : 'bg-teal-100 text-teal-800'
                       }`}
                     >
                       {u.role === 'ADMIN' ? <ShieldCheck className="w-3.5 h-3.5" /> : <ClipboardCheck className="w-3.5 h-3.5" />}
@@ -170,9 +170,9 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
       {modalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-lg w-full max-w-md">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800">Tambah Akun</h2>
-              <button onClick={() => !saving && setModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100">
+              <h2 className="font-bold text-navy-900">Tambah Akun</h2>
+              <button onClick={() => !saving && setModalOpen(false)} className="text-navy-300 hover:text-navy-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -183,28 +183,28 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
               )}
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Nama *</span>
+                <span className="block text-navy-600 mb-1">Nama *</span>
                 <input
                   required
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
               </label>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Email *</span>
+                <span className="block text-navy-600 mb-1">Email *</span>
                 <input
                   required
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
               </label>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Password Awal *</span>
+                <span className="block text-navy-600 mb-1">Password Awal *</span>
                 <input
                   required
                   minLength={6}
@@ -212,17 +212,17 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   placeholder="Minimal 6 karakter"
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 />
-                <span className="text-xs text-slate-400">Beritahu password ini ke user secara langsung/aman.</span>
+                <span className="text-xs text-navy-300">Beritahu password ini ke user secara langsung/aman.</span>
               </label>
 
               <label className="block text-sm">
-                <span className="block text-slate-600 mb-1">Role *</span>
+                <span className="block text-navy-600 mb-1">Role *</span>
                 <select
                   value={form.role}
                   onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'ADMIN' | 'ATASAN' }))}
-                  className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
                 >
                   <option value="ATASAN">Atasan (evaluator)</option>
                   <option value="ADMIN">Admin HC</option>
@@ -233,14 +233,14 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-sm font-semibold text-navy-600 hover:bg-navy-50"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-60"
                 >
                   {saving && <Loader2 className="w-4 h-4 animate-spin" />}
                   Buat Akun

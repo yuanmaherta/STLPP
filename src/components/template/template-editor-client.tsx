@@ -173,12 +173,12 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
       <input
         value={item.label}
         onChange={(e) => editLabel(bucket, groupIdx, item.id, e.target.value, subIdx)}
-        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-navy-600"
       />
       <button
         onClick={() => toggleActive(bucket, groupIdx, item.id, subIdx)}
         title={item.active === false ? 'Aktifkan lagi' : 'Nonaktifkan'}
-        className="text-slate-400 hover:text-slate-700 shrink-0"
+        className="text-navy-300 hover:text-navy-800 shrink-0"
       >
         {item.active === false ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
       </button>
@@ -190,21 +190,21 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
 
   return (
     <div>
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-white rounded-2xl border border-navy-100 shadow-card p-4 mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm text-slate-600">
-            Versi aktif saat ini: <span className="font-bold text-slate-800">{activeVersion}</span>
+          <p className="text-sm text-navy-600">
+            Versi aktif saat ini: <span className="font-bold text-navy-900">{activeVersion}</span>
           </p>
-          <p className="text-xs text-slate-400 mt-0.5">Perubahan baru tersimpan sebagai versi terpisah — evaluasi yang sudah selesai tetap memakai versi lama.</p>
+          <p className="text-xs text-navy-300 mt-0.5">Perubahan baru tersimpan sebagai versi terpisah — evaluasi yang sudah selesai tetap memakai versi lama.</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowHistory((s) => !s)} className="flex items-center gap-1.5 text-sm text-slate-600 hover:text-slate-800 px-3 py-2">
+          <button onClick={() => setShowHistory((s) => !s)} className="flex items-center gap-1.5 text-sm text-navy-600 hover:text-navy-900 px-3 py-2">
             <History className="w-4 h-4" /> Riwayat Versi
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 disabled:opacity-60"
+            className="flex items-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 disabled:opacity-60"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Simpan sebagai Versi Baru
@@ -224,10 +224,10 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
       )}
 
       {showHistory && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6">
-          <p className="font-semibold text-sm text-slate-800 mb-2">Riwayat Versi</p>
+        <div className="bg-white rounded-2xl border border-navy-100 shadow-card p-4 mb-6">
+          <p className="font-semibold text-sm text-navy-900 mb-2">Riwayat Versi</p>
           {history.length === 0 ? (
-            <p className="text-xs text-slate-400">Belum ada versi tersimpan di database — form saat ini masih memakai bawaan sistem ({activeVersion}).</p>
+            <p className="text-xs text-navy-300">Belum ada versi tersimpan di database — form saat ini masih memakai bawaan sistem ({activeVersion}).</p>
           ) : (
             <div className="space-y-1">
               {history.map((h) => (
@@ -237,7 +237,7 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                   </span>
                   <div className="flex items-center gap-2">
                     {h.is_active && <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-semibold">Aktif</span>}
-                    <span className="text-slate-400">{new Date(h.created_at).toLocaleString('id-ID')}</span>
+                    <span className="text-navy-300">{new Date(h.created_at).toLocaleString('id-ID')}</span>
                   </div>
                 </div>
               ))}
@@ -250,21 +250,21 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
         <div key={bucket} className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-bold text-blue-900 text-sm">{BUCKET_LABELS[bucket]}</h2>
-            <button onClick={() => addGroup(bucket)} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800">
+            <button onClick={() => addGroup(bucket)} className="flex items-center gap-1 text-xs text-navy-700 hover:text-navy-900">
               <Plus className="w-3.5 h-3.5" /> Tambah Kategori
             </button>
           </div>
           {structure[bucket].map((group: FormGroup, groupIdx: number) => (
-            <div key={`${group.group}-${groupIdx}`} className="bg-white rounded-lg border border-slate-200 mb-3 overflow-hidden">
-              <div className="bg-slate-50 px-4 py-2 flex items-center gap-2">
-                <span className="text-xs text-slate-400 w-6 shrink-0">{group.no ?? ''}</span>
+            <div key={`${group.group}-${groupIdx}`} className="bg-white rounded-lg border border-navy-100 mb-3 overflow-hidden">
+              <div className="bg-canvas px-4 py-2 flex items-center gap-2">
+                <span className="text-xs text-navy-300 w-6 shrink-0">{group.no ?? ''}</span>
                 <input
                   value={group.group}
                   onChange={(e) => editGroupTitle(bucket, groupIdx, e.target.value)}
-                  className="flex-1 bg-transparent font-semibold text-sm text-slate-700 border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1 py-0.5"
+                  className="flex-1 bg-transparent font-semibold text-sm text-navy-800 border-b border-transparent hover:border-navy-200 focus:border-blue-500 focus:outline-none px-1 py-0.5"
                 />
                 {group.subgroups && (
-                  <button onClick={() => addSubgroup(bucket, groupIdx)} title="Tambah sub-kategori" className="text-blue-600 hover:text-blue-800 shrink-0">
+                  <button onClick={() => addSubgroup(bucket, groupIdx)} title="Tambah sub-kategori" className="text-navy-700 hover:text-navy-900 shrink-0">
                     <Plus className="w-4 h-4" />
                   </button>
                 )}
@@ -278,7 +278,7 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                     {group.items.map((item) => renderItem(bucket, groupIdx, item))}
                     <button
                       onClick={() => addItem(bucket, groupIdx)}
-                      className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 mt-2"
+                      className="flex items-center gap-1 text-xs text-navy-700 hover:text-navy-900 mt-2"
                     >
                       <Plus className="w-3.5 h-3.5" /> Tambah unsur
                     </button>
@@ -291,7 +291,7 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                         <input
                           value={sg.label}
                           onChange={(e) => editSubgroupLabel(bucket, groupIdx, subIdx, e.target.value)}
-                          className="flex-1 bg-transparent text-xs font-bold uppercase tracking-wide text-slate-400 border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1"
+                          className="flex-1 bg-transparent text-xs font-bold uppercase tracking-wide text-navy-300 border-b border-transparent hover:border-navy-200 focus:border-blue-500 focus:outline-none px-1"
                         />
                         <button onClick={() => deleteSubgroup(bucket, groupIdx, subIdx)} title="Hapus sub-kategori" className="text-rose-400 hover:text-rose-600 shrink-0">
                           <Trash2 className="w-3.5 h-3.5" />
@@ -300,14 +300,14 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
                       {sg.items.map((item) => renderItem(bucket, groupIdx, item, subIdx))}
                       <button
                         onClick={() => addItem(bucket, groupIdx, subIdx)}
-                        className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 mt-1"
+                        className="flex items-center gap-1 text-xs text-navy-700 hover:text-navy-900 mt-1"
                       >
                         <Plus className="w-3.5 h-3.5" /> Tambah unsur
                       </button>
                     </div>
                   ))}
                 {!group.items && !group.subgroups && (
-                  <p className="text-xs text-slate-400 py-2">Kategori kosong.</p>
+                  <p className="text-xs text-navy-300 py-2">Kategori kosong.</p>
                 )}
               </div>
             </div>
