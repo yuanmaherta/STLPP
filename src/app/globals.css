@@ -6,6 +6,30 @@ body {
   min-height: 100vh;
 }
 
+/* Sedikit polish global: transisi halus, focus ring yang jelas untuk aksesibilitas */
+* {
+  transition-property: background-color, border-color, color, box-shadow, transform, opacity;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; }
+}
+
+*:focus-visible {
+  outline: 2px solid #C99A3D;
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D6DDE9; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #AEBBD3; }
+
+.font-display {
+  letter-spacing: -0.015em;
+}
+
 /* Tanpa ini, browser membuang semua warna background saat print/save-as-PDF
    untuk hemat tinta secara default — termasuk kotak abu-abu penanda skor
    terpilih di form evaluasi. */

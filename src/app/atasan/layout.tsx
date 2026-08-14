@@ -2,7 +2,7 @@ import { Sidebar } from '@/components/layout/sidebar';
 
 export default function AtasanLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen bg-slate-100 print:block print:bg-white">
+    <div className="flex min-h-screen bg-canvas print:block print:bg-white">
       <div className="print:hidden">
         <Sidebar variant="atasan" />
       </div>
