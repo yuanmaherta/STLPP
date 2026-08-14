@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -78,11 +79,9 @@ export function Sidebar({ variant }: SidebarProps) {
   return (
     <aside className="w-64 shrink-0 bg-navy-900 text-navy-100 min-h-screen flex flex-col">
       <div className="px-5 py-5 border-b border-white/10 flex items-center gap-2.5">
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" className="shrink-0" aria-hidden="true">
-          <rect x="2" y="16" width="5" height="8" rx="1" fill="#C99A3D" />
-          <rect x="10.5" y="10" width="5" height="14" rx="1" fill="#EBD39A" />
-          <rect x="19" y="2" width="5" height="22" rx="1" fill="#C99A3D" />
-        </svg>
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-white flex items-center justify-center p-1">
+          <Image src="/hk-icon.png" alt="Hutama Karya" width={28} height={14} className="w-full h-auto object-contain" />
+        </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.14em] text-navy-300 font-semibold font-display">STLPP</p>
           <p className="text-sm font-bold text-white -mt-0.5 font-display">{portalLabel}</p>

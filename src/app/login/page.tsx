@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Loader2, LogIn } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -45,11 +46,9 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-[42%] bg-navy-900 relative overflow-hidden flex-col justify-between p-12">
         <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(circle at 20% 15%, white 0%, transparent 40%), radial-gradient(circle at 85% 85%, white 0%, transparent 35%)' }} />
         <div className="relative flex items-center gap-3">
-          <svg width="30" height="30" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-            <rect x="2" y="16" width="5" height="8" rx="1" fill="#C99A3D" />
-            <rect x="10.5" y="10" width="5" height="14" rx="1" fill="#EBD39A" />
-            <rect x="19" y="2" width="5" height="22" rx="1" fill="#C99A3D" />
-          </svg>
+          <div className="w-11 h-11 rounded-lg bg-white flex items-center justify-center p-1.5 shrink-0">
+            <Image src="/hk-icon.png" alt="Hutama Karya" width={36} height={18} className="w-full h-auto object-contain" />
+          </div>
           <span className="text-white font-bold font-display tracking-tight">STLPP</span>
         </div>
         <div className="relative">
@@ -67,15 +66,11 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="max-w-sm w-full">
           <div className="text-center mb-8 lg:hidden">
-            <div className="inline-flex items-center gap-2 mb-2">
-              <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true">
-                <rect x="2" y="16" width="5" height="8" rx="1" fill="#C99A3D" />
-                <rect x="10.5" y="10" width="5" height="14" rx="1" fill="#AD7F2E" />
-                <rect x="19" y="2" width="5" height="22" rx="1" fill="#C99A3D" />
-              </svg>
-              <h1 className="text-2xl font-bold text-navy-900 font-display">STLPP</h1>
+            <div className="inline-flex justify-center mb-3">
+              <Image src="/hk-logo.png" alt="Hutama Karya" width={140} height={90} className="h-auto w-[140px]" priority />
             </div>
-            <p className="text-sm text-navy-400">
+            <h1 className="text-2xl font-bold text-navy-900 font-display">STLPP</h1>
+            <p className="text-sm text-navy-400 mt-1">
               Digital Contract Renewal Evaluation System
               <br />
               PT Hutama Karya (Persero)
