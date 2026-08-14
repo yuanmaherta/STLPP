@@ -173,7 +173,7 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
       <input
         value={item.label}
         onChange={(e) => editLabel(bucket, groupIdx, item.id, e.target.value, subIdx)}
-        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-navy-600"
+        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
       />
       <button
         onClick={() => toggleActive(bucket, groupIdx, item.id, subIdx)}
@@ -204,7 +204,7 @@ export function TemplateEditorClient({ initialStructure, activeVersion, history 
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 disabled:opacity-60"
+            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 disabled:opacity-60"
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Simpan sebagai Versi Baru

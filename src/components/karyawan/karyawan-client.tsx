@@ -161,12 +161,12 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari NIK / Nama / Divisi..."
-              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-72"
+              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
             />
           </div>
           <button
             onClick={openAdd}
-            className="flex items-center justify-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors"
+            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors"
           >
             <Plus className="w-4 h-4" /> Tambah Karyawan
           </button>
@@ -256,7 +256,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     required
                     value={form.nik}
                     onChange={(e) => setForm((f) => ({ ...f, nik: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
                 <label className="text-sm col-span-1">
@@ -265,7 +265,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     type="date"
                     value={form.tgl_lahir}
                     onChange={(e) => setForm((f) => ({ ...f, tgl_lahir: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
               </div>
@@ -276,7 +276,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                   required
                   value={form.nama}
                   onChange={(e) => setForm((f) => ({ ...f, nama: e.target.value }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </label>
 
@@ -287,7 +287,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     required
                     value={form.jabatan}
                     onChange={(e) => setForm((f) => ({ ...f, jabatan: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
                 <label className="text-sm">
@@ -296,7 +296,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     required
                     value={form.divisi}
                     onChange={(e) => setForm((f) => ({ ...f, divisi: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     <option value="">- Pilih -</option>
                     <optgroup label="Divisi (Kantor Pusat)">
@@ -322,7 +322,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                 <input
                   value={form.bagian}
                   onChange={(e) => setForm((f) => ({ ...f, bagian: e.target.value }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </label>
 
@@ -333,7 +333,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     placeholder="cth: 2 Tahun 3 Bulan"
                     value={form.masa_kerja}
                     onChange={(e) => setForm((f) => ({ ...f, masa_kerja: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
                 <label className="text-sm">
@@ -342,7 +342,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                     required
                     value={form.status_kontrak}
                     onChange={(e) => setForm((f) => ({ ...f, status_kontrak: e.target.value }))}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   >
                     {STATUS_KONTRAK_LIST.map((s) => (
                       <option key={s} value={s}>
@@ -360,7 +360,7 @@ export function KaryawanClient({ initialEmployees, loadError }: KaryawanClientPr
                   type="date"
                   value={form.tgl_habis_kontrak}
                   onChange={(e) => setForm((f) => ({ ...f, tgl_habis_kontrak: e.target.value }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </label>
               <p className="text-xs text-navy-300 -mt-2">

@@ -190,13 +190,13 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Cari karyawan / atasan / periode..."
-              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-72"
+              className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-72"
             />
           </div>
           <button
             onClick={openAdd}
             disabled={employees.length === 0 || atasanList.length === 0}
-            className="flex items-center justify-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Plus className="w-4 h-4" /> Tugaskan Penilaian
           </button>
@@ -279,7 +279,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                     value={empSearch}
                     onChange={(e) => setEmpSearch(e.target.value)}
                     placeholder="Cari nama / NIK / divisi..."
-                    className="w-full pl-9 pr-3 py-2 text-sm border border-navy-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full pl-9 pr-3 py-2 text-sm border border-navy-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div className="border border-navy-100 rounded-lg max-h-64 overflow-y-auto">
@@ -317,7 +317,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                   required
                   value={evaluatorId}
                   onChange={(e) => setEvaluatorId(e.target.value)}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="">- Pilih atasan -</option>
                   {atasanList.map((a) => (
@@ -336,7 +336,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                     placeholder="cth: Agustus 2026"
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
                 <label className="text-sm">
@@ -346,7 +346,7 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                     type="date"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
-                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                    className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </label>
               </div>

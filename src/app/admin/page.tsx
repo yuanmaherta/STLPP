@@ -40,25 +40,23 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <header className="mb-8 bg-navy-900 p-7 rounded-2xl shadow-card relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: 'radial-gradient(circle at 85% 20%, white 0%, transparent 45%)' }} />
-        <div className="relative">
-          <p className="text-xs uppercase tracking-[0.14em] text-gold-300 font-semibold mb-1">PT Hutama Karya (Persero)</p>
-          <h1 className="text-2xl font-bold text-white font-display">Dashboard Admin HC</h1>
-          <p className="text-sm text-navy-200 mt-1">Portal Evaluasi Perpanjangan Kontrak PKWT</p>
+      <header className="mb-6 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-navy-900 font-display">Dashboard</h1>
+          <p className="text-sm text-navy-400 mt-0.5">PT Hutama Karya (Persero) — Evaluasi Perpanjangan Kontrak PKWT</p>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <StatCard icon={Users} color="navy" label="Total Karyawan PKWT" value={totalEmployees ?? 0} />
-        <StatCard icon={FileText} color="gold" label="Evaluasi Pending" value={pendingCount ?? 0} />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <StatCard icon={Users} color="indigo" label="Total Karyawan PKWT" value={totalEmployees ?? 0} />
+        <StatCard icon={FileText} color="amber" label="Evaluasi Pending" value={pendingCount ?? 0} />
         <StatCard icon={CheckCircle2} color="emerald" label="Rekomendasi Lanjut" value={extendedCount ?? 0} />
         <StatCard icon={AlertCircle} color="rose" label="Tidak Diperpanjang" value={notExtendedCount ?? 0} />
       </div>
 
-      <div className="bg-white rounded-2xl border border-navy-100 shadow-card p-5 mb-8">
+      <div className="bg-white rounded-2xl border border-navy-100 shadow-card p-5 mb-6">
         <div className="flex items-center gap-2 mb-1">
-          <CalendarClock className="w-5 h-5 text-gold-600" />
+          <CalendarClock className="w-5 h-5 text-amber-500" />
           <h3 className="font-bold text-navy-900 text-sm font-display">Kontrak Akan Berakhir ({REMINDER_WINDOW_DAYS} Hari ke Depan)</h3>
         </div>
         <p className="text-xs text-navy-400 mb-4">Karyawan yang perlu segera dievaluasi/ditugaskan sebelum kontraknya habis.</p>
@@ -90,7 +88,7 @@ export default async function AdminDashboardPage() {
                       <td className="py-2">
                         <span
                           className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${
-                            urgent ? 'bg-rose-100 text-rose-700' : 'bg-gold-100 text-gold-700'
+                            urgent ? 'bg-rose-100 text-rose-700' : 'bg-amber-100 text-amber-700'
                           }`}
                         >
                           {d} hari lagi
@@ -112,20 +110,18 @@ export default async function AdminDashboardPage() {
 
 function StatCard({ icon: Icon, color, label, value }: { icon: any; color: string; label: string; value: number }) {
   const colorMap: Record<string, string> = {
-    navy: 'bg-navy-50 text-navy-700',
-    gold: 'bg-gold-50 text-gold-600',
-    emerald: 'bg-emerald-50 text-emerald-600',
-    rose: 'bg-rose-50 text-rose-600',
+    indigo: 'bg-indigo-600',
+    amber: 'bg-amber-500',
+    emerald: 'bg-emerald-500',
+    rose: 'bg-rose-500',
   };
   return (
-    <div className="bg-white p-5 rounded-2xl border border-navy-100 shadow-card hover:shadow-card-hover transition-shadow flex items-center gap-4">
-      <div className={`p-3 rounded-xl ${colorMap[color]}`}>
-        <Icon className="w-6 h-6" />
+    <div className="bg-white p-5 rounded-2xl border border-navy-100 shadow-card hover:shadow-card-hover transition-shadow">
+      <div className={`w-11 h-11 rounded-xl ${colorMap[color]} flex items-center justify-center mb-4`}>
+        <Icon className="w-5 h-5 text-white" />
       </div>
-      <div>
-        <p className="text-xs font-medium text-navy-400">{label}</p>
-        <p className="text-2xl font-bold text-navy-900 font-display">{value}</p>
-      </div>
+      <p className="text-xs font-medium text-navy-400">{label}</p>
+      <p className="text-2xl font-bold text-navy-900 font-display mt-0.5">{value}</p>
     </div>
   );
 }

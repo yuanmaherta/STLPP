@@ -223,13 +223,13 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Cari NIK / Nama..."
-                className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600 w-full sm:w-56"
+                className="pl-9 pr-4 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-full sm:w-56"
               />
             </div>
             <select
               value={divisiFilter}
               onChange={(e) => setDivisiFilter(e.target.value)}
-              className="px-3 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-navy-600"
+              className="px-3 py-2 text-sm border border-navy-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Semua Divisi</option>
               {divisions.map((d) => (
@@ -433,7 +433,7 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
               <button
                 onClick={handleGenerate}
                 disabled={downloading}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-navy-900 text-white hover:bg-navy-800 disabled:opacity-60"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-60"
               >
                 {downloading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {modalType === 'excel' ? 'Download Excel' : 'Preview PDF'}

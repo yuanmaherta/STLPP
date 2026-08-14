@@ -117,7 +117,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
           <p className="text-sm text-navy-400">{users.length} akun terdaftar</p>
           <button
             onClick={openAdd}
-            className="flex items-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-navy-800 transition-colors"
+            className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors"
           >
             <Plus className="w-4 h-4" /> Tambah Akun
           </button>
@@ -188,7 +188,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                   required
                   value={form.name}
                   onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </label>
 
@@ -199,7 +199,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </label>
 
@@ -212,7 +212,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                   value={form.password}
                   onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
                   placeholder="Minimal 6 karakter"
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
                 <span className="text-xs text-navy-300">Beritahu password ini ke user secara langsung/aman.</span>
               </label>
@@ -222,7 +222,7 @@ export function PenggunaClient({ initialUsers, loadError, currentUserId }: Pengg
                 <select
                   value={form.role}
                   onChange={(e) => setForm((f) => ({ ...f, role: e.target.value as 'ADMIN' | 'ATASAN' }))}
-                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-navy-600"
+                  className="w-full border border-navy-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   <option value="ATASAN">Atasan (evaluator)</option>
                   <option value="ADMIN">Admin HC</option>

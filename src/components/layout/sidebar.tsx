@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   History,
   LogOut,
+  Settings,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -77,18 +78,18 @@ export function Sidebar({ variant }: SidebarProps) {
   const initial = (userName ?? '?').trim().charAt(0).toUpperCase();
 
   return (
-    <aside className="w-64 shrink-0 bg-navy-900 text-navy-100 min-h-screen flex flex-col">
-      <div className="px-5 py-5 border-b border-white/10 flex items-center gap-2.5">
-        <div className="shrink-0 w-9 h-9 rounded-lg bg-white flex items-center justify-center p-1">
-          <Image src="/hk-icon.png" alt="Hutama Karya" width={28} height={14} className="w-full h-auto object-contain" />
+    <aside className="w-64 shrink-0 bg-white border-r border-navy-100 min-h-screen flex flex-col">
+      <div className="px-5 py-5 flex items-center gap-2.5">
+        <div className="shrink-0 w-9 h-9 flex items-center justify-center">
+          <Image src="/hk-icon.png" alt="Hutama Karya" width={32} height={16} className="w-full h-auto object-contain" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.14em] text-navy-300 font-semibold font-display">STLPP</p>
-          <p className="text-sm font-bold text-white -mt-0.5 font-display">{portalLabel}</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-navy-400 font-semibold font-display">STLPP</p>
+          <p className="text-sm font-bold text-navy-900 -mt-0.5 font-display">{portalLabel}</p>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
+      <nav className="flex-1 px-3 py-3 space-y-1">
         {items.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
@@ -96,38 +97,35 @@ export function Sidebar({ variant }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`group relative flex items-center gap-3 pl-3.5 pr-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                isActive ? 'bg-white/[0.07] text-white' : 'text-navy-200 hover:bg-white/[0.04] hover:text-white'
+              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                isActive ? 'bg-navy-900 text-white shadow-card' : 'text-navy-500 hover:bg-navy-50 hover:text-navy-900'
               }`}
             >
-              <span
-                className={`absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-gold-500 transition-opacity ${
-                  isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-30'
-                }`}
-              />
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-gold-400' : 'text-navy-300 group-hover:text-gold-400'}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-indigo-300' : 'text-navy-400'}`} />
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      <div className="px-4 py-4 border-t border-white/10 flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-navy-700 border border-white/10 flex items-center justify-center text-xs font-bold text-gold-300 font-display shrink-0">
-          {userName ? initial : ''}
+      <div className="p-3">
+        <div className="flex items-center gap-3 bg-navy-50 rounded-xl p-3">
+          <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-xs font-bold text-white font-display shrink-0">
+            {userName ? initial : ''}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-navy-900 truncate">{userName ?? 'Memuat...'}</p>
+            <p className="text-xs text-navy-400">{userRoleLabel}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title="Keluar"
+            className="text-navy-400 hover:text-navy-900 transition-colors disabled:opacity-50 shrink-0"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-white truncate">{userName ?? 'Memuat...'}</p>
-          <p className="text-xs text-navy-300">{userRoleLabel}</p>
-        </div>
-        <button
-          onClick={handleLogout}
-          disabled={loggingOut}
-          title="Keluar"
-          className="text-navy-300 hover:text-white transition-colors disabled:opacity-50 shrink-0"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
       </div>
     </aside>
   );
