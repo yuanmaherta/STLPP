@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'STLPP - Digital Contract Renewal Evaluation System',
+  title: 'Renewa - Digital Contract Renewal Evaluation System',
   description: 'Sistem Evaluasi Perpanjangan Kontrak Karyawan PKWT - PT Hutama Karya (Persero)',
 };
 

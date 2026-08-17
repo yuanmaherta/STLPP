@@ -84,7 +84,7 @@ export function Sidebar({ variant }: SidebarProps) {
           <Image src="/hk-icon.png" alt="Hutama Karya" width={32} height={16} className="w-full h-auto object-contain" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-[0.14em] text-navy-400 font-semibold font-display">STLPP</p>
+          <p className="text-[10px] uppercase tracking-[0.14em] text-navy-400 font-semibold font-display">Renewa</p>
           <p className="text-sm font-bold text-navy-900 -mt-0.5 font-display">{portalLabel}</p>
         </div>
       </div>

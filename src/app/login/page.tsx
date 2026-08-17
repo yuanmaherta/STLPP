@@ -49,7 +49,7 @@ export default function LoginPage() {
           <div className="w-11 h-11 rounded-lg bg-white flex items-center justify-center p-1.5 shrink-0">
             <Image src="/hk-icon.png" alt="Hutama Karya" width={36} height={18} className="w-full h-auto object-contain" />
           </div>
-          <span className="text-white font-bold font-display tracking-tight">STLPP</span>
+          <span className="text-white font-bold font-display tracking-tight">Renewa</span>
         </div>
         <div className="relative">
           <h2 className="text-3xl font-bold text-white font-display leading-tight max-w-sm">
@@ -69,7 +69,7 @@ export default function LoginPage() {
             <div className="inline-flex justify-center mb-3">
               <Image src="/hk-logo.png" alt="Hutama Karya" width={140} height={90} className="h-auto w-[140px]" priority />
             </div>
-            <h1 className="text-2xl font-bold text-navy-900 font-display">STLPP</h1>
+            <h1 className="text-2xl font-bold text-navy-900 font-display">Renewa</h1>
             <p className="text-sm text-navy-400 mt-1">
               Digital Contract Renewal Evaluation System
               <br />
