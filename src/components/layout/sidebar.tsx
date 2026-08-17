@@ -78,7 +78,7 @@ export function Sidebar({ variant }: SidebarProps) {
   const initial = (userName ?? '?').trim().charAt(0).toUpperCase();
 
   return (
-    <aside className="w-64 shrink-0 bg-white border-r border-navy-100 h-screen flex flex-col overflow-hidden">
+    <aside className="fixed inset-y-0 left-0 z-20 w-64 bg-white border-r border-navy-100 flex flex-col overflow-hidden">
       <div className="px-5 py-5 flex items-center gap-2.5">
         <div className="shrink-0 w-9 h-9 flex items-center justify-center">
           <Image src="/hk-icon.png" alt="Hutama Karya" width={32} height={16} className="w-full h-auto object-contain" />
