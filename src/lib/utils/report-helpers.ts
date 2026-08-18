@@ -18,5 +18,22 @@ export function durasiLabel(recommendation: string, duration: string | null): st
   if (recommendation !== 'DI PERPANJANG') return 'Tidak Diperpanjang';
   if (duration === '12') return 'Dilakukan Perpanjangan Kontrak 1 Tahun';
   if (duration === '6') return 'Dilakukan Perpanjangan Kontrak 6 Bulan';
+  const num = duration ? parseInt(duration, 10) : NaN;
+  if (!isNaN(num) && num < 6) return 'Dilakukan Perpanjangan Kontrak <6 Bulan';
   return `Dilakukan Perpanjangan Kontrak ${duration ?? '-'} Bulan (custom)`;
+}
+
+/**
+ * Kolom mana di matriks "Keberlanjutan Kontrak Kerja" (Tidak diperpanjang /
+ * 6 Bulan / 1 Tahun) yang harus ditandai. Durasi custom < 6 bulan tetap
+ * masuk grup "6 Bulan" (bukan otomatis ke "1 Tahun"), custom > 6 bulan
+ * (termasuk yang bukan tepat 12) masuk grup "1 Tahun".
+ */
+export function getDurationGroup(recommendation: string, duration: string | null): 'tidak' | 'enam' | 'setahun' {
+  if (recommendation !== 'DI PERPANJANG') return 'tidak';
+  if (duration === '6') return 'enam';
+  if (duration === '12') return 'setahun';
+  const num = duration ? parseInt(duration, 10) : NaN;
+  if (!isNaN(num) && num < 6) return 'enam';
+  return 'setahun';
 }

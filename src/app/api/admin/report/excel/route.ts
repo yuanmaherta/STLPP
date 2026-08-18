@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 import { createClient } from '@/lib/supabase/server';
-import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
+import { ageYearsOnly, sumScores, getDurationGroup } from '@/lib/utils/report-helpers';
 
 // ====================================================================
 // Warna & font ini dibaca LANGSUNG dari file RPPK-INFRA_II asli (bukan
@@ -154,8 +154,8 @@ export async function POST(request: Request) {
     const statusText = `${lulus}\n\n${edit.rekomendasi ?? ''}`;
     const checkboxText = '\u2610 Disetujui\n\u2610 Tidak Disetujui';
 
-    const [evpCol, dhclCol] =
-      row.recommendation !== 'DI PERPANJANG' ? ['H', 'I'] : row.duration === '6' ? ['J', 'K'] : ['L', 'M'];
+    const group = getDurationGroup(row.recommendation, row.duration);
+    const [evpCol, dhclCol] = group === 'tidak' ? ['H', 'I'] : group === 'enam' ? ['J', 'K'] : ['L', 'M'];
 
     ws1.getCell(`${evpCol}${r1}`).value = statusText;
     ws1.getCell(`${dhclCol}${r1}`).value = checkboxText;

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, renderToBuffer } from '@react-pdf/renderer';
 import { createClient } from '@/lib/supabase/server';
-import { ageYearsOnly, sumScores } from '@/lib/utils/report-helpers';
+import { ageYearsOnly, sumScores, getDurationGroup } from '@/lib/utils/report-helpers';
 
 const styles = StyleSheet.create({
   page: { padding: 18, fontSize: 6.5, fontFamily: 'Times-Roman' },
@@ -92,7 +92,8 @@ function Table1({ rows, edits }: { rows: any[]; edits: any[] }) {
         const lulus = r.recommendation === 'DI PERPANJANG' ? 'Lulus Evaluasi' : 'Tidak Lulus Evaluasi';
         const statusText = `${lulus}\n\n${edit.rekomendasi ?? ''}`;
         const checkboxText = '[ ] Disetujui\n[ ] Tidak Disetujui';
-        const groupIdx = r.recommendation !== 'DI PERPANJANG' ? 0 : r.duration === '6' ? 1 : 2;
+        const group = getDurationGroup(r.recommendation, r.duration);
+        const groupIdx = group === 'tidak' ? 0 : group === 'enam' ? 1 : 2;
 
         return (
           <View key={i} style={styles.row}>
