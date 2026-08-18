@@ -18,9 +18,7 @@ export function durasiLabel(recommendation: string, duration: string | null): st
   if (recommendation !== 'DI PERPANJANG') return 'Tidak Diperpanjang';
   if (duration === '12') return 'Dilakukan Perpanjangan Kontrak 1 Tahun';
   if (duration === '6') return 'Dilakukan Perpanjangan Kontrak 6 Bulan';
-  const num = duration ? parseInt(duration, 10) : NaN;
-  if (!isNaN(num) && num < 6) return 'Dilakukan Perpanjangan Kontrak <6 Bulan';
-  return `Dilakukan Perpanjangan Kontrak ${duration ?? '-'} Bulan (custom)`;
+  return `Dilakukan Perpanjangan Kontrak ${duration ?? '-'} Bulan`;
 }
 
 /**
