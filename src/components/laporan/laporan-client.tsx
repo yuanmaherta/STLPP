@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Search, FileSpreadsheet, FileText, Loader2, AlertCircle, X } from 'lucide-react';
 import { durasiLabel } from '@/lib/utils/report-helpers';
+import { AvatarInitial } from '@/components/layout/avatar-initial';
 
 interface EvalRow {
   id: string;
@@ -298,7 +299,12 @@ export function LaporanClient({ initialRows, loadError }: LaporanClientProps) {
                         {r.recommendation === 'DI PERPANJANG' ? `Diperpanjang${r.duration ? ` ${r.duration} Bln` : ''}` : 'Tidak Diperpanjang'}
                       </span>
                     </td>
-                    <td className="p-4 text-navy-600">{r.assignment?.evaluator?.name}</td>
+                    <td className="p-4 text-navy-600">
+                      <div className="flex items-center gap-2">
+                        <AvatarInitial name={r.assignment?.evaluator?.name} />
+                        {r.assignment?.evaluator?.name}
+                      </div>
+                    </td>
                   </tr>
                 );
               })}

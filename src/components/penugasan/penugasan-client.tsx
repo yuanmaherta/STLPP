@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Plus, Trash2, X, Loader2, AlertCircle, Search, CheckSquare, Square } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { AvatarInitial } from '@/components/layout/avatar-initial';
 
 interface EmployeeOption {
   id: string;
@@ -221,7 +222,12 @@ export function PenugasanClient({ initialAssignments, employees, atasanList, loa
                     <p className="font-semibold text-navy-900">{a.employee?.nama ?? '-'}</p>
                     <p className="text-xs text-navy-300">{a.employee?.jabatan}</p>
                   </td>
-                  <td className="p-4 text-navy-600">{a.evaluator?.name ?? '-'}</td>
+                  <td className="p-4 text-navy-600">
+                    <div className="flex items-center gap-2">
+                      {a.evaluator?.name && <AvatarInitial name={a.evaluator.name} />}
+                      {a.evaluator?.name ?? '-'}
+                    </div>
+                  </td>
                   <td className="p-4 text-navy-600">{a.period}</td>
                   <td className="p-4 text-navy-600">{a.deadline}</td>
                   <td className="p-4">

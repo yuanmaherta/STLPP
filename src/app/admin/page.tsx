@@ -40,14 +40,17 @@ export default async function AdminDashboardPage() {
 
   return (
     <div>
-      <header className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-navy-900 font-display">Dashboard</h1>
-          <p className="text-sm text-navy-400 mt-0.5">PT Hutama Karya (Persero) — Evaluasi Perpanjangan Kontrak PKWT</p>
+      {/* Hero band gradient + stat card "mengambang" di atasnya — pola khas referensi Nexilium */}
+      <div className="relative bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-2xl p-7 pb-16 overflow-hidden mb-2">
+        <div className="absolute -right-8 -top-10 w-56 h-56 rounded-full bg-white/10 pointer-events-none" />
+        <div className="absolute right-24 -bottom-16 w-40 h-40 rounded-full bg-white/10 pointer-events-none" />
+        <div className="relative">
+          <h1 className="text-2xl font-bold text-white font-display">Dashboard</h1>
+          <p className="text-sm text-indigo-100 mt-1">PT Hutama Karya (Persero) — Evaluasi Perpanjangan Kontrak PKWT</p>
         </div>
-      </header>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 -mt-10 relative z-10 mb-6 px-1">
         <StatCard icon={Users} color="indigo" label="Total Karyawan PKWT" value={totalEmployees ?? 0} />
         <StatCard icon={FileText} color="amber" label="Evaluasi Pending" value={pendingCount ?? 0} />
         <StatCard icon={CheckCircle2} color="emerald" label="Rekomendasi Lanjut" value={extendedCount ?? 0} />
@@ -116,12 +119,14 @@ function StatCard({ icon: Icon, color, label, value }: { icon: any; color: strin
     rose: 'bg-rose-500',
   };
   return (
-    <div className="bg-white p-5 rounded-2xl border border-navy-100 shadow-card hover:shadow-card-hover transition-shadow">
-      <div className={`w-11 h-11 rounded-xl ${colorMap[color]} flex items-center justify-center mb-4`}>
-        <Icon className="w-5 h-5 text-white" />
+    <div className="bg-white p-5 rounded-2xl shadow-card-hover hover:-translate-y-0.5 transition-transform">
+      <div className="flex items-start justify-between mb-3">
+        <p className="text-xs font-medium text-navy-400 max-w-[70%]">{label}</p>
+        <div className={`w-10 h-10 rounded-xl ${colorMap[color]} flex items-center justify-center shrink-0`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
       </div>
-      <p className="text-xs font-medium text-navy-400">{label}</p>
-      <p className="text-2xl font-bold text-navy-900 font-display mt-0.5">{value}</p>
+      <p className="text-2xl font-bold text-navy-900 font-display">{value}</p>
     </div>
   );
 }

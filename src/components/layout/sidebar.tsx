@@ -98,10 +98,10 @@ export function Sidebar({ variant }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                isActive ? 'bg-navy-900 text-white shadow-card' : 'text-navy-500 hover:bg-navy-50 hover:text-navy-900'
+                isActive ? 'bg-indigo-600 text-white shadow-card' : 'text-navy-500 hover:bg-navy-50 hover:text-navy-900'
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-indigo-300' : 'text-navy-400'}`} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-navy-400'}`} />
               {item.label}
             </Link>
           );
